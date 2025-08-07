@@ -1,138 +1,187 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agendac | +10 chantiers garantis</title>
-  <meta name="description" content="Agendac garantit +10 chantiers minimum en 90 jours pour les entreprises ENR. Sinon, c’est gratuit et vous recevez 1000 € de dédommagement.">
-  
-  <!-- Preconnect pour améliorer TTFB -->
-  <link rel="preconnect" href="https://fast.wistia.com" crossorigin>
-  <link rel="preconnect" href="https://app.iclosed.io" crossorigin>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Agendac - Obtenez +10 chantiers ENR garantis en 90 jours ou recevez 1 000 €">
+  <title>Agendac | +10 Chantiers ENR Garantis</title>
+  <link rel="preconnect" href="https://fast.wistia.com">
+  <link rel="preconnect" href="https://app.iclosed.io">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --main-color: #FFB002;
-      --dark: #111;
-      --light: #fff;
+      --primary-color: #0074D4;
+      --secondary-color: #FFB002;
+      --text-dark: #343435;
+      --text-gray: #475569;
+      --bg-light: #f8fafc;
+      --radius: 16px;
+      --highlight: #e0f0ff;
     }
 
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-      background: var(--light);
-      color: var(--dark);
-      line-height: 1.6;
+      font-family: 'Inter', sans-serif;
+      background-color: white;
+      color: var(--text-dark);
+      padding: 0;
     }
 
-    header {
-      background: var(--main-color);
-      color: var(--dark);
-      padding: 1.2rem;
+    p, .hero-text p {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
+    }
+
+    .top-banner {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.5rem 1rem;
       text-align: center;
-      font-weight: bold;
-      font-size: 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
     }
 
     .container {
-      padding: 1rem;
-      max-width: 1080px;
-      margin: auto;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
     }
 
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-      color: var(--main-color);
-    }
-
-    p {
-      margin-bottom: 1rem;
-    }
-
-    .row {
+    .hero {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 2rem;
+      align-items: center;
     }
 
-    .video, .form {
-      width: 100%;
-      min-height: 320px;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #f5f5f5;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .highlight {
-      background: var(--main-color);
-      padding: 1rem;
-      border-radius: 6px;
-      font-weight: bold;
+    .hero-text {
       text-align: center;
-      color: #000;
-      margin-bottom: 2rem;
+      max-width: 900px;
+    }
+
+    .hero-text h1 {
+      font-weight: 900;
+      font-size: 30px;
+      line-height: 1.3;
+      color: var(--primary-color);
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    }
+
+    .hero-text .contractuel {
+      color: var(--secondary-color);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    @media (min-width: 640px) {
+      .hero-text h1 {
+        font-size: 36px;
+      }
     }
 
     @media (min-width: 768px) {
-      .row {
-        flex-direction: row;
+      .hero-text h1 {
+        font-size: 48px;
       }
+    }
+
+    .hero-text p.guarantee {
+      margin-top: 1rem;
+      background-color: var(--highlight);
+      display: inline-block;
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      font-weight: 700;
+      color: var(--text-dark);
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .hero-text p.guarantee strong {
+      color: var(--primary-color);
+      font-weight: 700;
+    }
+
+    .hero-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      width: 100%;
+      margin-top: 2rem;
+    }
+
+    @media (min-width: 768px) {
+      .hero-content {
+        flex-direction: row;
+        gap: 2rem;
+      }
+    }
+
+    .video-box, .form-box {
+      flex: 1;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      padding: 1rem;
+    }
+
+    .video-box {
+      aspect-ratio: 16 / 9;
+    }
+
+    .video-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .form-box iframe {
+      width: 100%;
+      min-height: 500px;
+      border: none;
     }
 
     footer {
       text-align: center;
-      font-size: 0.8rem;
-      padding: 1rem;
-      color: #888;
-    }
-  </style>
-
-  <!-- Wistia script -->
-  <script src="https://fast.wistia.com/player.js" async></script>
-  <script src="https://fast.wistia.com/embed/vwnkq3qow0.js" async type="module"></script>
-  <style>
-    wistia-player[media-id='vwnkq3qow0']:not(:defined) {
-      background: center / cover no-repeat url('https://fast.wistia.com/embed/medias/vwnkq3qow0/swatch');
-      display: block;
-      filter: blur(3px);
-      padding-top: 56.25%;
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-top: 4rem;
+      padding: 2rem 1rem 0;
+      font-family: 'Montserrat', sans-serif;
     }
   </style>
 </head>
-
 <body>
-  <header>
-    Agendac — Agence d’acquisition solaire
-  </header>
-
+  <div class="top-banner">
+    Uniquement pour gérant·e·s de sociétés ENR réalisant plus de 300 000 € de chiffre d’affaires annuel
+  </div>
   <div class="container">
-
-    <h1>+10 chantiers garantis en 90 jours</h1>
-    <p class="highlight">Garantie +10 ou +1000 : sinon c’est gratuit et vous recevez 1 000 € de dédommagement.</p>
-
-    <div class="row">
-      <div class="video">
-        <wistia-player media-id="vwnkq3qow0" aspect="0.5625" fetchpriority="high" loading="eager"></wistia-player>
-      </div>
-
-      <div class="form">
-        <!-- iClosed inline widget begin -->
-        <div class="iclosed-widget" data-url="https://app.iclosed.io/e/agendac-sas/agendac" title="Agendac - 30 min Google Meet" style="width: 100%; height: 620px;"></div>
-        <script type="text/javascript" src="https://app.iclosed.io/assets/widget.js" async></script>
-        <!-- iClosed inline widget end -->
+    <div class="hero">
+      <div class="hero-text">
+        <h1><span>Agendac</span> vous garantit <span class="contractuel">contractuellement</span> +10 chantiers dans les 90 prochains jours</h1>
+        <p class="guarantee"><strong>Garantie +10 ou +1000</strong> : Objectif non atteint = 0 € payé + 1 000 € de dédommagement</p>
       </div>
     </div>
-  </div>
 
-  <footer>
-    © 2025 Agendac SAS — Tous droits réservés
-  </footer>
+    <div class="hero-content">
+      <div class="video-box">
+        <script src="https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp" async></script>
+        <script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>
+        <div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>
+      </div>
+
+      <div class="form-box">
+        <iframe title="Formulaire de rendez-vous Agendac" src="https://app.iclosed.io/e/agendac-sas/agendac" loading="lazy" fetchpriority="low"></iframe>
+      </div>
+    </div>
+
+    <footer>
+      © Agendac 2025 · <a href="#">Mentions légales</a> · <a href="#">Politique de confidentialité</a>
+    </footer>
+  </div>
 </body>
 </html>

@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agendac | +10 chantiers en 90 jours</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agendac | +10 chantiers garantis</title>
+  <meta name="description" content="Agendac garantit +10 chantiers minimum en 90 jours pour les entreprises ENR. Sinon, c’est gratuit et vous recevez 1000 € de dédommagement.">
+  
+  <!-- Preconnect pour améliorer TTFB -->
+  <link rel="preconnect" href="https://fast.wistia.com" crossorigin>
+  <link rel="preconnect" href="https://app.iclosed.io" crossorigin>
+
   <style>
     :root {
       --main-color: #FFB002;
       --dark: #111;
       --light: #fff;
-      --gray: #f7f7f7;
     }
 
     * {
@@ -46,12 +51,6 @@
       color: var(--main-color);
     }
 
-    h2 {
-      font-size: 1.2rem;
-      margin: 1rem 0 0.5rem;
-      color: var(--dark);
-    }
-
     p {
       margin-bottom: 1rem;
     }
@@ -64,31 +63,27 @@
 
     .video, .form {
       width: 100%;
+      min-height: 320px;
       border-radius: 10px;
       overflow: hidden;
+      background: #f5f5f5;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .highlight {
+      background: var(--main-color);
+      padding: 1rem;
+      border-radius: 6px;
+      font-weight: bold;
+      text-align: center;
+      color: #000;
+      margin-bottom: 2rem;
     }
 
     @media (min-width: 768px) {
       .row {
         flex-direction: row;
       }
-    }
-
-    .highlight {
-      background: var(--main-color);
-      padding: 0.8rem 1rem;
-      border-radius: 6px;
-      font-weight: bold;
-      text-align: center;
-      color: #000;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .notice {
-      text-align: center;
-      font-size: 0.9rem;
-      margin-bottom: 1.5rem;
     }
 
     footer {
@@ -99,35 +94,32 @@
     }
   </style>
 
-  <!-- Wistia video -->
+  <!-- Wistia script -->
   <script src="https://fast.wistia.com/player.js" async></script>
   <script src="https://fast.wistia.com/embed/vwnkq3qow0.js" async type="module"></script>
   <style>
     wistia-player[media-id='vwnkq3qow0']:not(:defined) {
-      background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/vwnkq3qow0/swatch');
+      background: center / cover no-repeat url('https://fast.wistia.com/embed/medias/vwnkq3qow0/swatch');
       display: block;
-      filter: blur(5px);
-      padding-top: 177.78%;
+      filter: blur(3px);
+      padding-top: 56.25%;
     }
   </style>
 </head>
-<body>
 
+<body>
   <header>
     Agendac — Agence d’acquisition solaire
   </header>
 
   <div class="container">
 
-    <div class="notice">⚡ Uniquement pour sociétés ENR avec plus de 300 000 € de CA annuel</div>
-
     <h1>+10 chantiers garantis en 90 jours</h1>
-
     <p class="highlight">Garantie +10 ou +1000 : sinon c’est gratuit et vous recevez 1 000 € de dédommagement.</p>
 
     <div class="row">
       <div class="video">
-        <wistia-player media-id="vwnkq3qow0" aspect="0.5625"></wistia-player>
+        <wistia-player media-id="vwnkq3qow0" aspect="0.5625" fetchpriority="high" loading="eager"></wistia-player>
       </div>
 
       <div class="form">
@@ -142,6 +134,5 @@
   <footer>
     © 2025 Agendac SAS — Tous droits réservés
   </footer>
-
 </body>
 </html>

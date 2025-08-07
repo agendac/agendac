@@ -7,7 +7,12 @@
   <meta name="theme-color" content="#0074D4">
   <title>Agendac | +10 Chantiers Garantis</title>
 
-  <link rel="preload" as="image" href="/images/preview-video.webp" fetchpriority="high">
+  <!-- Fonts Montserrat for guarantee text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@450;700&display=swap" rel="stylesheet">
+
+  <link rel="preload" as="image" href="https://embed-ssl.wistia.com/deliveries/1d509a13193f0a53c126cf2b1a02c881.webp?image_crop_resized=960x540" fetchpriority="high">
   <style>
     :root {
       --primary: #0074D4;
@@ -49,7 +54,13 @@
       margin-top: 1rem;
       padding: 0.75rem 1.25rem;
       border-radius: 12px;
-      font-weight: bold;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 450;
+    }
+    .guarantee strong {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      color: var(--primary);
     }
     .video-placeholder {
       position: relative;
@@ -89,7 +100,7 @@
     <p class="guarantee">Garantie <strong>+10 ou +1000</strong> : Objectif non atteint = 0 € payé + 1 000 € de dédommagement</p>
 
     <div class="video-placeholder" id="video-launch">
-      <img src="/images/preview-video.webp" alt="Vidéo Agendac">
+      <img src="https://embed-ssl.wistia.com/deliveries/1d509a13193f0a53c126cf2b1a02c881.webp?image_crop_resized=960x540" alt="Vidéo Agendac">
     </div>
 
     <div class="form-container">
@@ -104,15 +115,23 @@
   </footer>
 
   <script>
-    // Charger Wistia uniquement au clic
     document.getElementById('video-launch').addEventListener('click', function () {
-      const div = document.getElementById('video-launch');
-      div.innerHTML = '<script src="https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp" async><\/script>' +
-                      '<script src="https://fast.wistia.com/assets/external/E-v1.js" async><\/script>' +
-                      '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:360px;width:100%">&nbsp;<\/div>';
+      const container = document.getElementById('video-launch');
+      container.innerHTML = '<div class="wistia_responsive_wrapper" style="height:360px;width:100%">' +
+        '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>' +
+        '</div>';
+
+      const script1 = document.createElement('script');
+      script1.src = 'https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp';
+      script1.async = true;
+      document.body.appendChild(script1);
+
+      const script2 = document.createElement('script');
+      script2.src = 'https://fast.wistia.com/assets/external/E-v1.js';
+      script2.async = true;
+      document.body.appendChild(script2);
     });
 
-    // Lazy load form après scroll
     const iframe = document.getElementById('lazy-form');
     const io = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {

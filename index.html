@@ -12,15 +12,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@450;700&display=swap" rel="stylesheet">
 
+  <!-- Preload thumbnail image -->
   <link rel="preload" as="image" href="https://embed-ssl.wistia.com/deliveries/1d509a13193f0a53c126cf2b1a02c881.webp?image_crop_resized=960x540" fetchpriority="high">
+
   <style>
     :root {
       --primary: #0074D4;
       --secondary: #FFB002;
       --text: #343435;
-      --bg: #f8fafc;
       --highlight: #e0f0ff;
     }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: system-ui, sans-serif;
@@ -35,15 +37,16 @@
       font-weight: 600;
     }
     .container {
-      max-width: 800px;
+      max-width: 1000px;
       margin: auto;
       padding: 2rem 1rem;
       text-align: center;
     }
     h1 {
       font-size: 2rem;
-      font-weight: 900;
+      font-weight: 700;
       color: var(--primary);
+      margin-bottom: 0.5rem;
     }
     .contractuel {
       color: var(--secondary);
@@ -51,7 +54,7 @@
     .guarantee {
       background: var(--highlight);
       display: inline-block;
-      margin-top: 1rem;
+      margin: 0.5rem auto 2rem;
       padding: 0.75rem 1.25rem;
       border-radius: 12px;
       font-family: 'Montserrat', sans-serif;
@@ -62,25 +65,39 @@
       font-weight: 700;
       color: var(--primary);
     }
+    .content-flex {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    @media (min-width: 768px) {
+      .content-flex {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .content-flex > div {
+        flex: 1;
+      }
+      .video-placeholder { max-width: 60%; }
+      .widget-container { max-width: 35%; }
+    }
     .video-placeholder {
       position: relative;
       cursor: pointer;
-      margin: 2rem auto;
-      max-width: 100%;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      border-radius: 12px;
+      overflow: hidden;
     }
     .video-placeholder img {
       width: 100%;
-      height: auto;
-      border-radius: 12px;
+      height: 100%;
+      object-fit: cover;
     }
-    .form-container {
-      margin-top: 2rem;
-    }
-    .form-container iframe {
+    .widget-container {
       width: 100%;
-      height: 1200px;
-      border: none;
-      display: none;
     }
     footer {
       text-align: center;
@@ -99,15 +116,19 @@
     <h1>Agendac vous garantit <span class="contractuel">contractuellement</span><br> +10 chantiers dans les 90 prochains jours</h1>
     <p class="guarantee">Garantie <strong>+10 ou +1000</strong> : Objectif non atteint = 0 € payé + 1 000 € de dédommagement</p>
 
-    <div class="video-placeholder" id="video-launch">
-      <img src="https://embed-ssl.wistia.com/deliveries/1d509a13193f0a53c126cf2b1a02c881.webp?image_crop_resized=960x540" alt="Vidéo Agendac">
-    </div>
+    <section class="content-flex">
+      <div class="video-placeholder" id="video-launch">
+        <img src="https://embed-ssl.wistia.com/deliveries/1d509a13193f0a53c126cf2b1a02c881.webp?image_crop_resized=960x540" alt="Vidéo Agendac">
+      </div>
 
-    <div class="form-container">
-      <iframe id="lazy-form" title="Formulaire de rendez-vous Agendac"
-        src="https://app.iclosed.io/e/agendac-sas/agendac"
-        loading="lazy"></iframe>
-    </div>
+      <div class="widget-container">
+        <!-- iClosed inline widget begin -->
+        <div class="iclosed-widget" data-url="https://app.iclosed.io/e/agendac-sas/agendac" title="Agendac - 30 min Google Meet" style="width:100%; height:620px"></div>
+        <!-- iClosed inline widget script -->
+        <script type="text/javascript" src="https://app.iclosed.io/assets/widget.js" async></script>
+        <!-- iClosed inline widget end -->
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -115,31 +136,18 @@
   </footer>
 
   <script>
+    // Charger Wistia au clic
     document.getElementById('video-launch').addEventListener('click', function () {
-      const container = document.getElementById('video-launch');
-      container.innerHTML = '<div class="wistia_responsive_wrapper" style="height:360px;width:100%">' +
+      const container = this;
+      container.innerHTML = '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">' +
         '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>' +
         '</div>';
-
-      const script1 = document.createElement('script');
-      script1.src = 'https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp';
-      script1.async = true;
-      document.body.appendChild(script1);
-
-      const script2 = document.createElement('script');
-      script2.src = 'https://fast.wistia.com/assets/external/E-v1.js';
-      script2.async = true;
-      document.body.appendChild(script2);
+      ['https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp',
+       'https://fast.wistia.com/assets/external/E-v1.js']
+      .forEach(src => {
+        const s = document.createElement('script'); s.src = src; s.async = true; document.body.appendChild(s);
+      });
     });
-
-    const iframe = document.getElementById('lazy-form');
-    const io = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        iframe.style.display = 'block';
-        io.disconnect();
-      }
-    });
-    io.observe(iframe);
   </script>
 </body>
 </html>

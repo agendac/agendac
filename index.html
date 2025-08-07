@@ -121,21 +121,22 @@
       border: none;
       padding: 0;
       cursor: pointer;
+      width: 100%;
+      display: block;
     }
 
     .wistia-thumbnail {
-  width: 100%;
-  height: auto;
-  display: block;
-  aspect-ratio: 16 / 9; /* Par défaut desktop */
-}
+      width: 100%;
+      height: auto;
+      display: block;
+      aspect-ratio: 16 / 9;
+    }
 
-@media (max-width: 767px) {
-  .wistia-thumbnail {
-    aspect-ratio: 9 / 16; /* Sur mobile seulement */
-  }
-}
-
+    @media (max-width: 767px) {
+      .wistia-thumbnail {
+        aspect-ratio: 9 / 16;
+      }
+    }
 
     .form-box iframe {
       width: 100%;

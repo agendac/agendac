@@ -24,6 +24,11 @@
       padding: 0;
     }
 
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: white;
@@ -111,23 +116,34 @@
       flex: 1;
     }
 
-    .video-box .wistia_responsive_wrapper {
+    .wistia_responsive_wrapper {
       width: 100%;
       height: auto;
-      aspect-ratio: 16 / 9;
+    }
+
+    .wistia_responsive_wrapper .wistia_embed {
+      width: 100%;
+      height: 100%;
     }
 
     @media (max-width: 767px) {
-      .video-box .wistia_responsive_wrapper {
+      .wistia_responsive_wrapper {
         aspect-ratio: 9 / 16;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .wistia_responsive_wrapper {
+        aspect-ratio: 16 / 9;
       }
     }
 
     .form-box iframe {
       width: 100%;
-      height: auto;
+      min-height: 900px;
       border: none;
       display: block;
+      overflow: hidden;
     }
 
     footer {
@@ -177,6 +193,18 @@
 
     <script>
       const iframe = document.getElementById('iclosed-frame');
+
+      // Auto height fallback (mutation observer)
+      const observer = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          if (entry.contentRect.height > 0) {
+            iframe.style.height = entry.contentRect.height + 'px';
+          }
+        }
+      });
+
+      observer.observe(iframe);
+
       window.addEventListener('message', function(event) {
         if (event.origin.includes('iclosed.io') && event.data && event.data.type === 'setHeight') {
           iframe.style.height = event.data.height + 'px';

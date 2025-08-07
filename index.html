@@ -16,7 +16,6 @@
       --text-dark: #343435;
       --bg-light: #f8fafc;
       --highlight: #e0f0ff;
-      --radius: 16px;
     }
 
     *, *::before, *::after {
@@ -110,10 +109,6 @@
 
     .video-box, .form-box {
       flex: 1;
-      background-color: #fff;
-      border-radius: var(--radius);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-      overflow: hidden;
     }
 
     .video-box .wistia_responsive_wrapper {
@@ -124,6 +119,8 @@
 
     .form-box iframe {
       width: 100%;
+      height: 100dvh;
+      min-height: 700px;
       border: none;
       display: block;
     }
@@ -163,8 +160,7 @@
           title="Formulaire de rendez-vous Agendac" 
           src="https://app.iclosed.io/e/agendac-sas/agendac" 
           loading="lazy" 
-          fetchpriority="low"
-          onload="this.style.height=this.contentWindow.document.body.scrollHeight + 'px';">
+          fetchpriority="low">
         </iframe>
       </div>
     </div>

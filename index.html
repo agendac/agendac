@@ -116,33 +116,16 @@
       overflow: hidden;
     }
 
-    .video-box button {
-      background: none;
-      border: none;
-      padding: 0;
-      cursor: pointer;
+    .video-box .wistia_responsive_wrapper {
       width: 100%;
-      display: block;
-    }
-
-    .wistia-thumbnail {
-      width: 100%;
-      height: auto;
-      display: block;
+      height: 100%;
       aspect-ratio: 16 / 9;
-    }
-
-    @media (max-width: 767px) {
-      .wistia-thumbnail {
-        aspect-ratio: 9 / 16;
-      }
     }
 
     .form-box iframe {
       width: 100%;
-      height: 100%;
-      min-height: 500px;
       border: none;
+      display: block;
     }
 
     footer {
@@ -168,34 +151,26 @@
 
     <div class="hero-content">
       <div class="video-box">
-        <button id="playWistia" aria-label="Lire la vidéo">
-          <img
-            src="https://fast.wistia.com/embed/medias/vwnkq3qow0/swatch"
-            class="wistia-thumbnail"
-            alt="Miniature de la vidéo Agendac"
-            loading="lazy"
-            fetchpriority="high">
-        </button>
+        <div class="wistia_responsive_wrapper">
+          <script src="https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp" async></script>
+          <script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>
+          <div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>
+        </div>
       </div>
 
       <div class="form-box">
-        <iframe title="Formulaire de rendez-vous Agendac" src="https://app.iclosed.io/e/agendac-sas/agendac" loading="lazy" fetchpriority="low"></iframe>
+        <iframe 
+          title="Formulaire de rendez-vous Agendac" 
+          src="https://app.iclosed.io/e/agendac-sas/agendac" 
+          loading="lazy" 
+          fetchpriority="low"
+          onload="this.style.height=this.contentWindow.document.body.scrollHeight + 'px';">
+        </iframe>
       </div>
     </div>
 
     <footer>
       © Agendac 2025 · <a href="#">Mentions légales</a> · <a href="#">Politique de confidentialité</a>
     </footer>
-
-    <script>
-      document.getElementById('playWistia').addEventListener('click', function () {
-        const videoBox = document.querySelector('.video-box');
-        videoBox.innerHTML = `
-          <script src="https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp" async><\/script>
-          <script src="https://fast.wistia.com/assets/external/E-v1.js" async><\/script>
-          <div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>
-        `;
-      });
-    </script>
 </body>
 </html>

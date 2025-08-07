@@ -113,14 +113,19 @@
 
     .video-box .wistia_responsive_wrapper {
       width: 100%;
-      height: 100%;
+      height: auto;
       aspect-ratio: 16 / 9;
+    }
+
+    @media (max-width: 767px) {
+      .video-box .wistia_responsive_wrapper {
+        aspect-ratio: 9 / 16;
+      }
     }
 
     .form-box iframe {
       width: 100%;
-      height: 100dvh;
-      min-height: 700px;
+      height: auto;
       border: none;
       display: block;
     }
@@ -159,6 +164,7 @@
         <iframe 
           title="Formulaire de rendez-vous Agendac" 
           src="https://app.iclosed.io/e/agendac-sas/agendac" 
+          id="iclosed-frame"
           loading="lazy" 
           fetchpriority="low">
         </iframe>
@@ -168,5 +174,14 @@
     <footer>
       © Agendac 2025 · <a href="#">Mentions légales</a> · <a href="#">Politique de confidentialité</a>
     </footer>
+
+    <script>
+      const iframe = document.getElementById('iclosed-frame');
+      window.addEventListener('message', function(event) {
+        if (event.origin.includes('iclosed.io') && event.data && event.data.type === 'setHeight') {
+          iframe.style.height = event.data.height + 'px';
+        }
+      }, false);
+    </script>
 </body>
 </html>

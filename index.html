@@ -140,8 +140,8 @@
 
     .form-box iframe {
       width: 100%;
-      min-height: 1400px;
-      height: auto;
+      height: 100%;
+      min-height: 700px;
       border: none;
       display: block;
       overflow: hidden;
@@ -156,6 +156,16 @@
       font-family: 'Montserrat', sans-serif;
     }
   </style>
+  <script>
+    window.addEventListener("message", function (event) {
+      if (event.origin.includes("iclosed.io") && event.data?.type === "resize") {
+        const iframe = document.getElementById("iclosed-frame");
+        if (iframe && event.data?.height) {
+          iframe.style.height = event.data.height + "px";
+        }
+      }
+    });
+  </script>
 </head>
 <body>
   <div class="top-banner">

@@ -24,6 +24,7 @@
 
   <!-- Preconnect: uniquement les origines utiles au démarrage -->
   <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://app.iclosed.io" crossorigin>
 
   <!-- Preload miniature LCP (responsive) -->
   <link rel="preload" as="image"
@@ -49,6 +50,7 @@
     .video-placeholder { cursor:pointer; width:100%; aspect-ratio:9/16; border-radius:12px; overflow:hidden; }
     .video-placeholder img { width:100%; height:100%; object-fit:cover; }
     .widget-container { width:100%; min-height:620px; }
+    .iclosed-frame { width:100%; height:620px; border:0; display:block; }
     @media (min-width:768px){
       .content-flex { flex-direction:row; justify-content:center; align-items:flex-start; }
       .video-placeholder { width:360px; }
@@ -82,10 +84,12 @@
         </div>
       </div>
 
-      <div class="widget-container" id="iclosed-root">
-        <button id="open-widget" aria-label="Ouvrir le planning" style="padding:.75rem 1.25rem;border-radius:12px;border:0;background:#0074D4;color:#fff;font-weight:600;cursor:pointer">
-          Réserver un créneau
-        </button>
+      <div class="widget-container">
+        <iframe id="iclosed-frame" title="Agendac - 30 min Google Meet" class="iclosed-frame"
+                loading="lazy" fetchpriority="low" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <noscript>
+          <iframe title="Agendac - 30 min Google Meet" class="iclosed-frame" src="https://app.iclosed.io/e/agendac-sas/agendac"></iframe>
+        </noscript>
       </div>
     </section>
   </main>
@@ -111,14 +115,25 @@
         .forEach(function(src){ var s=document.createElement('script'); s.src=src; s.async=true; document.body.appendChild(s); });
     }, { once:true });
 
-    // 2) iClosed: CHARGEMENT AU CLIC UNIQUEMENT (score max)
-    function loadIClosed(){ if (window.__iclosed_loaded) return; window.__iclosed_loaded = true;
-      var root = document.getElementById('iclosed-root');
-      root.innerHTML = '<div class="iclosed-widget" data-url="https://app.iclosed.io/e/agendac-sas/agendac" title="Agendac - 30 min Google Meet" style="width:100%;height:620px"></div>';
-      var s = document.createElement('script'); s.src = 'https://app.iclosed.io/assets/widget.js'; s.async = true; document.body.appendChild(s);
+    // 2) iClosed: IFRAME DIRECT (optimisé Lighthouse)
+    function setIclosedSrc(){
+      var f = document.getElementById('iclosed-frame');
+      if (f && !f.src) f.src = 'https://app.iclosed.io/e/agendac-sas/agendac';
     }
-    document.getElementById('open-widget').addEventListener('click', loadIClosed, { once:true });
-    // Pas d'IntersectionObserver / pas de requestIdleCallback pour éviter tout coût CPU avant interaction
+    if (matchMedia && matchMedia('(min-width:768px)').matches) {
+      // Desktop: charge immédiatement pour affichage direct en 2 colonnes
+      setIclosedSrc();
+    } else if ('IntersectionObserver' in window) {
+      // Mobile: charge au moment d'entrer dans le viewport (évite le coût tant que non visible)
+      var io = new IntersectionObserver(function(entries){
+        if (entries.some(function(e){ return e.isIntersecting; })) { setIclosedSrc(); io.disconnect(); }
+      }, { rootMargin:'200px' });
+      io.observe(document.querySelector('.widget-container'));
+    } else {
+      // Fallback: première interaction
+      addEventListener('click', setIclosedSrc, {once:true});
+      addEventListener('scroll', setIclosedSrc, {once:true, passive:true});
+    }
   </script>
 </body>
 </html>

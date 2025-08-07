@@ -22,7 +22,7 @@
       --text: #343435;
       --highlight: #e0f0ff;
     }
-    * { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: system-ui, sans-serif;
@@ -65,26 +65,24 @@
       font-weight: 700;
       color: var(--primary);
     }
+    .cta {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
     .content-flex {
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: 1.5rem;
+    }
+    .video-column {
+      display: flex;
+      flex-direction: column;
       align-items: center;
     }
-    @media (min-width: 768px) {
-      .content-flex {
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: space-between;
-      }
-      .content-flex > div {
-        flex: 1;
-      }
-      .video-placeholder { max-width: 60%; }
-      .widget-container { max-width: 35%; }
-    }
     .video-placeholder {
-      position: relative;
       cursor: pointer;
       width: 100%;
       aspect-ratio: 9 / 16;
@@ -98,6 +96,22 @@
     }
     .widget-container {
       width: 100%;
+    }
+    @media (min-width: 768px) {
+      .content-flex {
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+      }
+      .video-column {
+        flex: none;
+      }
+      .video-placeholder {
+        width: 360px;
+      }
+      .widget-container {
+        flex: 1;
+      }
     }
     footer {
       text-align: center;
@@ -117,8 +131,11 @@
     <p class="guarantee">Garantie <strong>+10 ou +1000</strong> : Objectif non atteint = 0 € payé + 1 000 € de dédommagement</p>
 
     <section class="content-flex">
-      <div class="video-placeholder" id="video-launch">
-        <img src="https://embed-ssl.wistia.com/deliveries/1d509a13193f0a53c126cf2b1a02c881.webp?image_crop_resized=960x540" alt="Vidéo Agendac">
+      <div class="video-column">
+        <p class="cta">Cliquez sur la vidéo pour la lancer</p>
+        <div class="video-placeholder" id="video-launch">
+          <img src="https://embed-ssl.wistia.com/deliveries/1d509a13193f0a53c126cf2b1a02c881.webp?image_crop_resized=960x540" alt="Vidéo Agendac">
+        </div>
       </div>
 
       <div class="widget-container">
@@ -132,11 +149,11 @@
   </main>
 
   <footer>
-    © Agendac 2025 &middot; <a href="#">Mentions légales</a> &middot; <a href="#">Politique de confidentialité</a>
+    © Agendac 2025 · <a href="#">Mentions légales</a> · <a href="#">Politique de confidentialité</a>
   </footer>
 
   <script>
-    // Charger Wistia au clic
+    // Charger Wistia au clic, une seule fois
     document.getElementById('video-launch').addEventListener('click', function () {
       const container = this;
       container.innerHTML = '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">' +
@@ -147,7 +164,7 @@
       .forEach(src => {
         const s = document.createElement('script'); s.src = src; s.async = true; document.body.appendChild(s);
       });
-    });
+    }, { once: true });
   </script>
 </body>
 </html>

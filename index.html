@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendac | +10 chantiers garantis en 90 jours</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #000;
+      line-height: 1.5;
+    }
+
+    header {
+      background: #0070f3;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .container {
+      padding: 1rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    h1, h2 {
+      color: #0070f3;
+      margin-bottom: 0.5rem;
+    }
+
+    .cta {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .video {
+      margin: 2rem 0;
+    }
+
+    .widget {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    @media(min-width: 768px) {
+      .row {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+      }
+      .video, .form {
+        flex: 1;
+      }
+    }
+  </style>
+
+  <!-- Wistia Script -->
+  <script src="https://fast.wistia.com/player.js" async></script>
+  <script src="https://fast.wistia.com/embed/vwnkq3qow0.js" async type="module"></script>
+  <style>
+    wistia-player[media-id='vwnkq3qow0']:not(:defined) {
+      background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/vwnkq3qow0/swatch');
+      display: block;
+      filter: blur(5px);
+      padding-top:177.78%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Agendac</h1>
+    <p>Agence d'acquisition</p>
+  </header>
+
+  <div class="container">
+
+    <p style="text-align: center;">🔵 Uniquement pour sociétés ENR à plus de 300 000 € de CA annuel 🔵</p>
+
+    <h2>Agendac vous garantit <strong>contractuellement +10 chantiers minimum en 90 jours</strong></h2>
+    <p class="cta">Garantie +10 ou +1000 : Si ce seuil n’est pas atteint, cela ne vous coûte rien et recevez 1 000 € de dédommagement.</p>
+
+    <div class="row">
+      <div class="video">
+        <wistia-player media-id="vwnkq3qow0" aspect="0.5625"></wistia-player>
+      </div>
+
+      <div class="form">
+        <!-- iClosed inline widget begin -->
+        <div class="iclosed-widget widget" data-url="https://app.iclosed.io/e/agendac-sas/agendac" title="Agendac - 30 min Google Meet" style="height: 620px;"></div>
+        <script type="text/javascript" src="https://app.iclosed.io/assets/widget.js" async></script>
+        <!-- iClosed inline widget end -->
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

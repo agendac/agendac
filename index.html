@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-KH65F94J');</script>
-  <!-- End Google Tag Manager -->
+  <!-- GTM: chargement retardé pour de meilleures perfs -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    window.gtmId = 'GTM-KH65F94J';
+    function loadGTM(){ if (window.__gtm_loaded) return; window.__gtm_loaded = true;
+      var s = document.createElement('script'); s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtm.js?id=' + window.gtmId;
+      document.head.appendChild(s);
+    }
+    addEventListener('click', loadGTM, {once:true});
+    addEventListener('scroll', loadGTM, {once:true, passive:true});
+    addEventListener('keydown', loadGTM, {once:true});
+    window.addEventListener('load', function(){
+      if ('requestIdleCallback' in window) requestIdleCallback(loadGTM, {timeout:3000});
+      else setTimeout(loadGTM, 3000);
+    });
+  </script>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,169 +25,106 @@
   <meta name="theme-color" content="#0074D4">
   <title>Agendac | +10 Chantiers Garantis</title>
 
-  <!-- Preconnect to critical origins -->
+  <!-- Preconnect (limité aux origines utilisées très tôt) -->
   <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://fast.wistia.com" crossorigin>
-  <link rel="preconnect" href="https://app.iclosed.io" crossorigin>
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 
-  <!-- Preload thumbnail image -->
-  <link rel="preload" as="image" href="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/68952f60cf860d40bb208689.webp" fetchpriority="high">
+  <!-- Preload miniature LCP -->
+  <link rel="preload" as="image" href="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/689534043ee1292ca8ccb143.webp" fetchpriority="high">
 
   <style>
-    :root {
-      --primary: #0074D4;
-      --secondary: #FFB002;
-      --text: #343435;
-      --highlight: #e0f0ff;
+    :root { --primary:#0074D4; --secondary:#FFB002; --text:#343435; --highlight:#e0f0ff; }
+    *, *::before, *::after { box-sizing:border-box; }
+    body { margin:0; font-family:system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background:#fff; color:var(--text); }
+    .top-banner { background:var(--primary); color:#fff; text-align:center; padding:0.5rem; font-weight:600; }
+    .container { max-width:1000px; margin:auto; padding:2rem 1rem; text-align:center; }
+    h1 { font-size:2rem; font-weight:700; color:var(--primary); margin-bottom:0.5rem; }
+    .contractuel { color:var(--secondary); }
+    .guarantee { background:var(--highlight); display:inline-block; margin:0.5rem auto 2rem; padding:0.75rem 1.25rem; border-radius:12px; font-weight:500; }
+    .guarantee strong { font-weight:700; color:var(--primary); }
+    .cta { font-size:1rem; font-weight:600; color:var(--primary); margin-bottom:0.5rem; }
+    .content-flex { display:flex; flex-direction:column; align-items:center; gap:1.5rem; }
+    .video-column { display:flex; flex-direction:column; align-items:center; }
+    .video-placeholder { cursor:pointer; width:100%; aspect-ratio:9/16; border-radius:12px; overflow:hidden; }
+    .video-placeholder img { width:100%; height:100%; object-fit:cover; }
+    .widget-container { width:100%; min-height:620px; }
+    @media (min-width:768px){
+      .content-flex { flex-direction:row; justify-content:center; align-items:flex-start; }
+      .video-placeholder { width:360px; }
+      .widget-container { flex:1; }
     }
-    *, *::before, *::after { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: #fff;
-      color: var(--text);
-    }
-    .top-banner {
-      background: var(--primary);
-      color: #fff;
-      text-align: center;
-      padding: 0.5rem;
-      font-weight: 600;
-    }
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 2rem 1rem;
-      text-align: center;
-    }
-    h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 0.5rem;
-    }
-    .contractuel {
-      color: var(--secondary);
-    }
-    .guarantee {
-      background: var(--highlight);
-      display: inline-block;
-      margin: 0.5rem auto 2rem;
-      padding: 0.75rem 1.25rem;
-      border-radius: 12px;
-      font-weight: 450;
-    }
-    .guarantee strong {
-      font-weight: 700;
-      color: var(--primary);
-    }
-    .cta {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--primary);
-      margin-bottom: 0.5rem;
-    }
-    .content-flex {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-    }
-    .video-column {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .video-placeholder {
-      cursor: pointer;
-      width: 100%;
-      aspect-ratio: 9 / 16;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .video-placeholder img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .widget-container {
-      width: 100%;
-    }
-    @media (min-width: 768px) {
-      .content-flex {
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-start;
-      }
-      .video-placeholder {
-        width: 360px;
-      }
-      .widget-container {
-        flex: 1;
-      }
-    }
-    footer {
-      text-align: center;
-      font-size: 0.8rem;
-      color: #64748b;
-      margin: 3rem 0 1rem;
-    }
+    footer { text-align:center; font-size:0.8rem; color:#64748b; margin:3rem 0 1rem; }
   </style>
 </head>
 <body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KH65F94J"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
-
-  <div class="top-banner">
-    Uniquement pour sociétés ENR<br>à plus de 300 000 € de CA annuel
-  </div>
+  <!-- GTM noscript -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KH65F94J" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  
+  <div class="top-banner">Uniquement pour sociétés ENR<br>à plus de 300 000 € de CA annuel</div>
 
   <main class="container">
     <h1>Agendac vous garantit <span class="contractuel">contractuellement</span><br> +10 chantiers dans les 90 prochains jours</h1>
-    <p class="guarantee"><strong>Garantie +10 ou +1000</strong> :<br>Si ce seuil n’est pas atteint, cela ne vous coûte rien et recevez 1 000 € de dédommagement.</p>
+    <p class="guarantee"><strong>Garantie +10 ou +1000</strong> :<br>Si ce seuil n’est pas atteint, cela ne vous coûte rien et recevez 1 000 € de dédommagement.</p>
 
     <section class="content-flex">
       <div class="video-column">
         <p class="cta">Cliquez sur la vidéo pour la lancer</p>
         <div class="video-placeholder" id="video-launch">
-          <img src="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/68952f60cf860d40bb208689.webp" alt="Vidéo Agendac">
+          <img
+            src="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/689534043ee1292ca8ccb143.webp"
+            alt="Vidéo Agendac"
+            width="360" height="640"
+            fetchpriority="high" decoding="async">
         </div>
       </div>
 
-      <div class="widget-container">
-        <!-- iClosed inline widget begin -->
-        <div class="iclosed-widget" data-url="https://app.iclosed.io/e/agendac-sas/agendac" title="Agendac - 30 min Google Meet" style="width:100%; height:620px"></div>
-        <script type="text/javascript" src="https://app.iclosed.io/assets/widget.js" async></script>
-        <!-- iClosed inline widget end -->
+      <div class="widget-container" id="iclosed-root">
+        <button id="open-widget" aria-label="Ouvrir le planning" style="padding:.75rem 1.25rem;border-radius:12px;border:0;background:#0074D4;color:#fff;font-weight:600;cursor:pointer">
+          Réserver un créneau
+        </button>
       </div>
     </section>
   </main>
 
   <footer>
-  <p style="color:#666666;font-size:0.8rem;line-height:1.5;">
-    © Copyright 2025, Tous droits réservés.<br>
-    Ce site ne fait pas partie du site Web de Facebook™ ou de Facebook™ Inc. De plus, ce site n'est en aucun cas approuvé par Facebook™. FACEBOOK™ est une marque commerciale de FACEBOOK™, Inc.<br>
-    Agendac SAS - SIREN : 930805981 - TVA : FR94930805981<br>
-    Capital social 100€ RCS Annecy B 930805981<br>
-    Un site de <a href="https://agendac.fr" style="color:#666666; text-decoration:underline;">agendac.fr</a>
-  </p>
-</footer>
+    <p style="color:#666666;font-size:0.8rem;line-height:1.5;">
+      © Copyright 2025, Tous droits réservés.<br>
+      Ce site ne fait pas partie du site Web de Facebook™ ou de Facebook™ Inc. De plus, ce site n'est en aucun cas approuvé par Facebook™. FACEBOOK™ est une marque commerciale de FACEBOOK™, Inc.<br>
+      Agendac SAS - SIREN : 930805981 - TVA : FR94930805981<br>
+      Capital social 100€ RCS Annecy B 930805981<br>
+      Un site de <a href="https://agendac.fr" style="color:#666666; text-decoration:underline;">agendac.fr</a>
+    </p>
+  </footer>
 
   <script>
-    document.getElementById('video-launch').addEventListener('click', function () {
-      const container = this;
-      container.innerHTML = '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">' +
-        '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>' +
-        '</div>';
-      [
-        'https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp',
-        'https://fast.wistia.com/assets/external/E-v1.js'
-      ].forEach(src => {
-        const s = document.createElement('script'); s.src = src; s.async = true; document.body.appendChild(s);
+    // 1) Wistia: charger au premier clic uniquement
+    document.getElementById('video-launch').addEventListener('click', function(){
+      var container = this;
+      container.innerHTML = '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">'+
+        '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>'+
+      '</div>';
+      ['https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp','https://fast.wistia.com/assets/external/E-v1.js']
+        .forEach(function(src){ var s=document.createElement('script'); s.src=src; s.async=true; document.body.appendChild(s); });
+    }, { once:true });
+
+    // 2) iClosed: charger au clic / apparition / idle
+    function loadIClosed(){ if (window.__iclosed_loaded) return; window.__iclosed_loaded = true;
+      var root = document.getElementById('iclosed-root');
+      root.innerHTML = '<div class="iclosed-widget" data-url="https://app.iclosed.io/e/agendac-sas/agendac" title="Agendac - 30 min Google Meet" style="width:100%;height:620px"></div>';
+      var s = document.createElement('script'); s.src = 'https://app.iclosed.io/assets/widget.js'; s.async = true; document.body.appendChild(s);
+    }
+    document.getElementById('open-widget').addEventListener('click', loadIClosed, { once:true });
+    if ('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(entries){
+        if (entries.some(function(e){ return e.isIntersecting; })){ loadIClosed(); io.disconnect(); }
       });
-    }, { once: true });
+      io.observe(document.getElementById('iclosed-root'));
+    }
+    window.addEventListener('load', function(){
+      if ('requestIdleCallback' in window) requestIdleCallback(loadIClosed, {timeout:4000});
+      else setTimeout(loadIClosed, 4000);
+    });
   </script>
 </body>
 </html>

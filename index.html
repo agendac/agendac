@@ -13,7 +13,6 @@
     addEventListener('click', loadGTM, {once:true});
     addEventListener('keydown', loadGTM, {once:true});
     addEventListener('scroll', loadGTM, {once:true, passive:true});
-    // Pas de fallback idle pour ne pas impacter TBT
   </script>
 
   <meta charset="UTF-8">
@@ -28,7 +27,7 @@
 
   <!-- Preload miniature LCP (responsive) -->
   <link rel="preload" as="image"
-        href="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/689537063ee1291e9bccb8e3.webp"
+        href="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/68953706cf860dbc03208f0c.webp"
         imagesrcset="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/68953706cf860dbc03208f0c.webp 380w,
                       https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/689537063ee1291e9bccb8e3.webp 760w"
         imagesizes="(max-width: 768px) 380px, 360px"
@@ -40,8 +39,8 @@
     body { margin:0; font-family:system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background:#fff; color:var(--text); }
     .top-banner { background:var(--primary); color:#fff; text-align:center; padding:0.5rem; font-weight:600; }
     .container { max-width:1000px; margin:auto; padding:2rem 1rem; text-align:center; }
-    h1 { font-size:2rem; font-weight:700; color:var(--primary); margin-bottom:0.5rem; }
-    .contractuel { color:var(--secondary); text-shadow: 0 1px 1px rgba(0,0,0,0.24); }
+    h1 { font-size:2rem; font-weight:700; color:var(--primary); margin-bottom:0.5rem; text-shadow: 0 1px 1px rgba(0,0,0,0.18); }
+    .contractuel { color:var(--secondary); text-shadow: 0 1px 1px rgba(0,0,0,0.28); }
     .guarantee { background:var(--highlight); display:inline-block; margin:0.5rem auto 2rem; padding:0.75rem 1.25rem; border-radius:12px; font-weight:500; }
     .guarantee strong { font-weight:700; color:var(--primary); text-shadow: 0 1px 1px rgba(0,0,0,0.18); }
     .cta { font-size:1rem; font-weight:600; color:var(--primary); margin-bottom:0.5rem; line-height:1.25; min-height:1.25em; }
@@ -49,7 +48,7 @@
     .video-column { display:flex; flex-direction:column; align-items:center; }
     .video-placeholder { cursor:pointer; width:100%; aspect-ratio:9/16; border-radius:12px; overflow:hidden; }
     .video-placeholder img { width:100%; height:100%; object-fit:cover; }
-    .widget-container { width:100%; min-height:620px; }
+    .widget-container { width:100%; max-width:1500px; min-height:620px; }
     .iclosed-frame { width:100%; height:620px; border:0; display:block; }
     @media (min-width:768px){
       .content-flex { flex-direction:row; justify-content:center; align-items:flex-start; }
@@ -62,7 +61,7 @@
 <body>
   <!-- GTM noscript -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KH65F94J" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  
+
   <div class="top-banner">Uniquement pour sociétés ENR<br>à plus de 300 000 € de CA annuel</div>
 
   <main class="container">
@@ -74,7 +73,7 @@
         <p class="cta">Cliquez sur la vidéo pour la lancer</p>
         <div class="video-placeholder" id="video-launch">
           <img
-            src="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/689537063ee1291e9bccb8e3.webp"
+            src="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/68953706cf860dbc03208f0c.webp"
             srcset="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/68953706cf860dbc03208f0c.webp 380w,
                     https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/689537063ee1291e9bccb8e3.webp 760w"
             sizes="(max-width: 768px) 380px, 360px"
@@ -105,32 +104,27 @@
   </footer>
 
   <script>
-    // 1) Wistia: charger au premier clic uniquement
     document.getElementById('video-launch').addEventListener('click', function(){
       var container = this;
       container.innerHTML = '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">'+
-        '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>'+
+        '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>'+ 
       '</div>';
       ['https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp','https://fast.wistia.com/assets/external/E-v1.js']
         .forEach(function(src){ var s=document.createElement('script'); s.src=src; s.async=true; document.body.appendChild(s); });
     }, { once:true });
 
-    // 2) iClosed: IFRAME DIRECT (optimisé Lighthouse)
     function setIclosedSrc(){
       var f = document.getElementById('iclosed-frame');
       if (f && !f.src) f.src = 'https://app.iclosed.io/e/agendac-sas/agendac';
     }
     if (matchMedia && matchMedia('(min-width:768px)').matches) {
-      // Desktop: charge immédiatement pour affichage direct en 2 colonnes
       setIclosedSrc();
     } else if ('IntersectionObserver' in window) {
-      // Mobile: charge au moment d'entrer dans le viewport (évite le coût tant que non visible)
       var io = new IntersectionObserver(function(entries){
         if (entries.some(function(e){ return e.isIntersecting; })) { setIclosedSrc(); io.disconnect(); }
       }, { rootMargin:'200px' });
       io.observe(document.querySelector('.widget-container'));
     } else {
-      // Fallback: première interaction
       addEventListener('click', setIclosedSrc, {once:true});
       addEventListener('scroll', setIclosedSrc, {once:true, passive:true});
     }

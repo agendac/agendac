@@ -1,41 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-
-<!-- Meta domain verification for agendac-sas.fr -->
-<meta name="facebook-domain-verification" content="v6v1wt60haps0t5u3riwjlyvex6jce" />
-
-<!-- Hotjar Tracking Code for agendac-sas.fr -->
-<script>
-    (function(h,o,t,j,a,r){
-        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-        h._hjSettings={hjid:6488598,hjsv:6};
-        a=o.getElementsByTagName('head')[0];
-        r=o.createElement('script');r.async=1;
-        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-        a.appendChild(r);
-    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-</script>
-
-  <!-- GTM: charge seulement après interaction pour score max -->
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    window.gtmId = 'GTM-KH65F94J';
-    function loadGTM(){ if (window.__gtm_loaded) return; window.__gtm_loaded = true;
-      var s = document.createElement('script'); s.async = true;
-      s.src = 'https://www.googletagmanager.com/gtm.js?id=' + window.gtmId;
-      document.head.appendChild(s);
-    }
-    addEventListener('click', loadGTM, {once:true});
-    addEventListener('keydown', loadGTM, {once:true});
-    addEventListener('scroll', loadGTM, {once:true, passive:true});
-  </script>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Agendac vous garantit contractuellement +10 chantiers ENR dans les 90 prochains jours ou vous êtes remboursé.">
   <meta name="theme-color" content="#0074D4">
   <title>Agendac | +10 Chantiers Garantis</title>
+
+  <!-- Meta domain verification for agendac-sas.fr -->
+  <meta name="facebook-domain-verification" content="v6v1wt60haps0t5u3riwjlyvex6jce" />
 
   <!-- Preconnect: uniquement les origines utiles au démarrage -->
   <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
@@ -46,6 +19,7 @@
         href="https://storage.googleapis.com/msgsndr/3mjO6BtorlJoRALz1hhZ/media/68953706cf860dbc03208f0c.webp"
         fetchpriority="high">
 
+  <!-- Styles -->
   <style>
     :root { --primary:#0074D4; --secondary:#FFB002; --text:#343435; --highlight:#e0f0ff; }
     *, *::before, *::after { box-sizing:border-box; }
@@ -70,10 +44,71 @@
     }
     footer { text-align:center; font-size:0.8rem; color:#64748b; margin:3rem 0 1rem; }
   </style>
+
+  <!-- Hotjar Tracking Code for agendac-sas.fr -->
+  <script>
+    (function(h,o,t,j,a,r){
+      h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+      h._hjSettings={hjid:6488598,hjsv:6};
+      a=o.getElementsByTagName('head')[0];
+      r=o.createElement('script');r.async=1;
+      r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+      a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+  </script>
+
+  <!-- DataLayer + PageView (custom) + GTM lazy loader (avec callback) -->
+  <script>
+    // DataLayer global
+    window.dataLayer = window.dataLayer || [];
+
+    // Flags anti-doublon
+    window.__pv_fired = false;
+    window.__gtm_loaded = false;
+
+    // Fonction pour pousser un "view_page" custom que GTM lira à l'arrivée
+    function fireViewPage(){
+      if (window.__pv_fired) return;
+      window.__pv_fired = true;
+      window.dataLayer.push({
+        event: 'view_page',
+        event_id: Date.now().toString(),
+        page_location: location.href,
+        page_path: location.pathname + location.search + location.hash,
+        page_title: document.title,
+        page_referrer: document.referrer || null
+      });
+    }
+
+    // Push immédiat (sera consommé par GTM quand il se charge)
+    fireViewPage();
+
+    // GTM: charge seulement après interaction pour score max, avec callback
+    window.gtmId = 'GTM-KH65F94J';
+    function loadGTM(cb){
+      if (window.__gtm_loaded) { cb && cb(); return; }
+      window.__gtm_loaded = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtm.js?id=' + window.gtmId;
+      s.onload = function(){
+        // Sécurité : si le push initial a eu lieu trop tôt, on repousse une seule fois
+        fireViewPage();
+        cb && cb();
+      };
+      document.head.appendChild(s);
+    }
+
+    addEventListener('click',  function(){ loadGTM(); }, {once:true});
+    addEventListener('keydown', function(){ loadGTM(); }, {once:true});
+    addEventListener('scroll', function(){ loadGTM(); }, {once:true, passive:true});
+  </script>
 </head>
 <body>
-  <!-- GTM noscript -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KH65F94J" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- GTM noscript (chargera le container si JS désactivé) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KH65F94J" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
 
   <div class="top-banner">Uniquement pour sociétés ENR<br>à plus de 300 000 € de CA annuel</div>
 
@@ -101,7 +136,6 @@
           class="iclosed-frame"
           loading="lazy"
           fetchpriority="low"
-          /* IMPORTANT: envoie le referrer complet en HTTPS→HTTPS (chemin + query) */
           referrerpolicy="no-referrer-when-downgrade"
           src="https://app.iclosed.io/e/agendac-sas/agendac">
         </iframe>
@@ -119,33 +153,44 @@
     </p>
   </footer>
 
-  <!-- Lecture vidéo Wistia au clic -->
-<script>
-  document.getElementById('video-launch').addEventListener('click', function(){
-    // 0) S'assure que GTM se charge maintenant (si lazy)
-    if (typeof loadGTM === 'function') loadGTM();
+  <!-- Lecture vidéo Wistia au clic + push d'un Custom Event vers GTM -->
+  <script>
+    (function(){
+      var el = document.getElementById('video-launch');
+      if (!el) return;
 
-    // 1) Envoi d'un Custom Event à GTM
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: 'video_thumb_click',
-      event_category: 'Engagement',
-      event_action: 'ViewContent',
-      event_label: 'Wistia vwnkq3qow0',
-      content_type: 'video',
-      content_name: 'Agendac hero video'
-    });
+      el.addEventListener('click', function(){
+        // S'assure que GTM est chargé (si lazy)
+        if (typeof loadGTM === 'function') loadGTM();
 
-    // 2) Code existant pour lancer la vidéo
-    var container = this;
-    container.innerHTML = '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">' +
-      '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>' +
-    '</div>';
-    ['https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp','https://fast.wistia.com/assets/external/E-v1.js']
-      .forEach(function(src){ var s=document.createElement('script'); s.src=src; s.async=true; document.body.appendChild(s); });
-  }, { once:true });
-</script>
+        // Envoi d'un Custom Event à GTM
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'video_thumb_click',
+          event_category: 'Engagement',
+          event_action: 'ViewContent',
+          event_label: 'Wistia vwnkq3qow0',
+          content_type: 'video',
+          content_name: 'Agendac hero video',
+          event_id: Date.now().toString()
+        });
 
+        // Lancement de la vidéo Wistia
+        var container = this;
+        container.innerHTML =
+          '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">' +
+            '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>' +
+          '</div>';
+
+        ['https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp','https://fast.wistia.com/assets/external/E-v1.js']
+          .forEach(function(src){
+            var s=document.createElement('script');
+            s.src=src; s.async=true;
+            document.body.appendChild(s);
+          });
+      }, { once:true });
+    })();
+  </script>
 
   <!-- Propagation AUTOMATIQUE de tous les paramètres d'URL vers l'iframe iClosed -->
   <script>
@@ -153,28 +198,23 @@
       var iframe = document.getElementById('iclosed-frame');
       if (!iframe) return;
 
-      // Construit un objet URL pour l'iframe
       var url = new URL(iframe.getAttribute('src'), window.location.href);
 
       // 1) Params de la page (query string)
       var pageParams = new URLSearchParams(window.location.search);
 
-      // 2) Params dans le hash (ex: #utm_source=...&gclid=...)
-      //    Plusieurs plateformes collent les UTM après # ; on les récupère proprement.
+      // 2) Params dans le hash (#utm_source=...&gclid=...)
       (function copyHashParams(){
         var hash = window.location.hash || '';
         if (hash.startsWith('#')) hash = hash.slice(1);
         if (!hash) return;
-
-        // Si le hash ressemble déjà à "a=b&c=d", on le prend tel quel.
-        // Sinon, si c'est un seul param type "gclid=...", URLSearchParams saura le lire.
         var hashParams = new URLSearchParams(hash);
         hashParams.forEach(function(value, key){
           if (!pageParams.has(key)) pageParams.set(key, value);
         });
       })();
 
-      // 3) Merge sans écraser d'éventuels params déjà présents sur l'iframe
+      // 3) Merge sans écraser les params déjà présents sur l'iframe
       var srcParams = url.searchParams;
       var somethingToAdd = false;
       pageParams.forEach(function(value, key){

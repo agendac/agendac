@@ -79,9 +79,16 @@
 
       <div class="widget-container">
         <p class="cta">Entrez vos informations pour voir s'il reste des créneaux :</p>
-        <iframe id="iclosed-frame" title="Agendac - 30 min Google Meet" class="iclosed-frame"
-                loading="lazy" fetchpriority="low" referrerpolicy="strict-origin-when-cross-origin"
-                src="https://app.iclosed.io/e/agendac-sas/agendac"></iframe>
+        <iframe
+          id="iclosed-frame"
+          title="Agendac - 30 min Google Meet"
+          class="iclosed-frame"
+          loading="lazy"
+          fetchpriority="low"
+          /* IMPORTANT: envoie le referrer complet en HTTPS→HTTPS (chemin + query) */
+          referrerpolicy="no-referrer-when-downgrade"
+          src="https://app.iclosed.io/e/agendac-sas/agendac">
+        </iframe>
       </div>
     </section>
   </main>
@@ -96,15 +103,60 @@
     </p>
   </footer>
 
+  <!-- Lecture vidéo Wistia au clic -->
   <script>
     document.getElementById('video-launch').addEventListener('click', function(){
       var container = this;
-      container.innerHTML = '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">'+
-        '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>'+ 
+      container.innerHTML = '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">' +
+        '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>' +
       '</div>';
       ['https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp','https://fast.wistia.com/assets/external/E-v1.js']
         .forEach(function(src){ var s=document.createElement('script'); s.src=src; s.async=true; document.body.appendChild(s); });
     }, { once:true });
+  </script>
+
+  <!-- Propagation AUTOMATIQUE de tous les paramètres d'URL vers l'iframe iClosed -->
+  <script>
+    (function () {
+      var iframe = document.getElementById('iclosed-frame');
+      if (!iframe) return;
+
+      // Construit un objet URL pour l'iframe
+      var url = new URL(iframe.getAttribute('src'), window.location.href);
+
+      // 1) Params de la page (query string)
+      var pageParams = new URLSearchParams(window.location.search);
+
+      // 2) Params dans le hash (ex: #utm_source=...&gclid=...)
+      //    Plusieurs plateformes collent les UTM après # ; on les récupère proprement.
+      (function copyHashParams(){
+        var hash = window.location.hash || '';
+        if (hash.startsWith('#')) hash = hash.slice(1);
+        if (!hash) return;
+
+        // Si le hash ressemble déjà à "a=b&c=d", on le prend tel quel.
+        // Sinon, si c'est un seul param type "gclid=...", URLSearchParams saura le lire.
+        var hashParams = new URLSearchParams(hash);
+        hashParams.forEach(function(value, key){
+          if (!pageParams.has(key)) pageParams.set(key, value);
+        });
+      })();
+
+      // 3) Merge sans écraser d'éventuels params déjà présents sur l'iframe
+      var srcParams = url.searchParams;
+      var somethingToAdd = false;
+      pageParams.forEach(function(value, key){
+        if (!srcParams.has(key)) {
+          srcParams.set(key, value);
+          somethingToAdd = true;
+        }
+      });
+
+      // 4) Recharge l'iframe uniquement si on a ajouté quelque chose
+      if (somethingToAdd) {
+        iframe.src = url.toString();
+      }
+    })();
   </script>
 </body>
 </html>

@@ -120,16 +120,32 @@
   </footer>
 
   <!-- Lecture vidéo Wistia au clic -->
-  <script>
-    document.getElementById('video-launch').addEventListener('click', function(){
-      var container = this;
-      container.innerHTML = '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">' +
-        '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>' +
-      '</div>';
-      ['https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp','https://fast.wistia.com/assets/external/E-v1.js']
-        .forEach(function(src){ var s=document.createElement('script'); s.src=src; s.async=true; document.body.appendChild(s); });
-    }, { once:true });
-  </script>
+<script>
+  document.getElementById('video-launch').addEventListener('click', function(){
+    // 0) S'assure que GTM se charge maintenant (si lazy)
+    if (typeof loadGTM === 'function') loadGTM();
+
+    // 1) Envoi d'un Custom Event à GTM
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'video_thumb_click',
+      event_category: 'Engagement',
+      event_action: 'ViewContent',
+      event_label: 'Wistia vwnkq3qow0',
+      content_type: 'video',
+      content_name: 'Agendac hero video'
+    });
+
+    // 2) Code existant pour lancer la vidéo
+    var container = this;
+    container.innerHTML = '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">' +
+      '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>' +
+    '</div>';
+    ['https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp','https://fast.wistia.com/assets/external/E-v1.js']
+      .forEach(function(src){ var s=document.createElement('script'); s.src=src; s.async=true; document.body.appendChild(s); });
+  }, { once:true });
+</script>
+
 
   <!-- Propagation AUTOMATIQUE de tous les paramètres d'URL vers l'iframe iClosed -->
   <script>

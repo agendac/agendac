@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Black Hole — Lensing + Photon Ring + Layered Stars + Gravity Capture</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+      "lil-gui": "https://unpkg.com/lil-gui@0.18/dist/lil-gui.esm.js"
+    }
+  }
+  </script>
+  <style>
+    html, body { height:100%; margin:0; background:#000; color:#ddd; }
+    #app { position:fixed; inset:0; }
+    .credit { position:fixed; left:12px; bottom:10px; font:12px/1.2 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:#9aa; opacity:.9; user-select:none; pointer-events:none; text-shadow:0 1px 2px #000a; }
+    .btn { position:fixed; left:12px; top:12px; z-index:5; background:#111a; border:1px solid #333; color:#ddd; padding:6px 10px; border-radius:8px; font:12px/1 system-ui; cursor:pointer; backdrop-filter: blur(6px); }
+    .btn:hover{ background:#1a1f; }
+    .warn { position:fixed; inset:auto auto 12px 12px; background:#220; color:#fbb; border:1px solid #633; padding:6px 8px; border-radius:8px; display:none; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <button class="btn" id="resetCam">Reset Camera</button>
+  <div class="credit">Black hole lensing demo — photon ring, Einstein ring, layered starfields, gravity capture. (H = hide UI)</div>
+  <div id="compat" class="warn">Your browser doesn’t support ES Modules / Import Maps. Try a recent Chrome, Edge, Firefox, or Safari.</div>
+
+  <noscript><div class="warn" style="display:block">JavaScript is disabled. Enable it to view the 3D scene.</div></noscript>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+    import GUI from 'lil-gui';
+
+    // --- Renderer / Scenes / Camera -------------------------------------------------
+    const app = document.getElementById('app');
+    const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.45; // brighter by default
+    renderer.shadowMap.enabled = false;
+    app.appendChild(renderer.domElement);
+
+    // Split into background and foreground scenes so we can lens only the background
+    const bgScene = new THREE.Scene();   // far + near stars (distant sky)
+    const fgScene = new THREE.Scene();   // black hole, disk, solar systems
+
+    const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.01, 5e6);
+    camera.position.set(0, 5, 18);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; controls.dampingFactor = 0.05;
+    controls.minDistance = 2.2; controls.maxDistance = 800;
+
+    // --- Clock ----------------------------------------------------------------------
+    const clock = new THREE.Clock();
+
+    // --- Lighting (kept faint; most things are emissive) -----------------------------
+    const ambient = new THREE.AmbientLight(0x404040, 0.4);
+    fgScene.add(ambient);
+    const hemi = new THREE.HemisphereLight(0x8899ff, 0x332211, 0.15);
+    fgScene.add(hemi);
+
+    // --- Params / GUI ----------------------------------------------------------------
+    const params = {
+      // Black hole & disk
+      bhRadius: 1.6,
+      spin: 0.45,
+      diskInner: 1.9,
+      diskOuter: 5.2,
+      diskGlow: 3.6,
+      diskSpeed: 0.7,
+      exposure: 1.45,
+      // Lensing
+      lensingEnabled: true,
+      lensingStrength: 1.05,
+      ringRadius: 0.52,   // ~ photon ring (screen-space fraction relative to frame min dimension)
+      ringWidth: 0.018,
+      ringGlow: 1.45,
+      lensBackgroundOnly: true,   // background-only lensing
+      depthAwareForForeground: true, // heuristic: lens foreground bodies only if behind the BH
+      // Stars
+      farStarCount: 35000,
+      nearStarCount: 2500,
+      // Solar systems
+      solarSystems: 8,
+      planetSpeed: 1.2,
+      sysDrift: 0.25,
+      captureRadius: 9.0, // if a system center crosses this, it’s “captured” and respawned
+      animate: true
+    };
+    renderer.toneMappingExposure = params.exposure;
+
+    // --- Black Hole Core (event horizon) + subtle halo --------------------------------
+    const bhGroup = new THREE.Group();
+    fgScene.add(bhGroup);
+
+    // Event horizon (purely absorptive)
+    const bhMat = new THREE.ShaderMaterial({
+      uniforms: { uCam: { value: new THREE.Vector3() } },
+      vertexShader: `
+        varying vec3 vWorldPos;
+        void main(){
+          vec4 wp = modelMatrix * vec4(position,1.0);
+          vWorldPos = wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }`,
+      fragmentShader: `
+        varying vec3 vWorldPos;
+        uniform vec3 uCam;
+        void main(){
+          // Hard black with a whisper of Fresnel to shape the silhouette
+          vec3 N = normalize(vWorldPos);
+          vec3 V = normalize(uCam - vWorldPos);
+          float fres = pow(1.0 - max(dot(N,V), 0.0), 1.5);
+          float shade = 0.0 + 0.02*fres;
+          gl_FragColor = vec4(vec3(shade)*0.0, 1.0);
+        }`,
+      depthWrite: true
+    });
+    const bhMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 128, 128), bhMat);
+    bhGroup.add(bhMesh);
+
+    // Subtle emissive halo around photon sphere (billboarded ring-ish glow)
+    const haloGeo = new THREE.PlaneGeometry(6, 6);
+    const haloMat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uStrength: { value: 0.6 },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main(){
+          vUv = uv;
+          vec4 p = modelViewMatrix * vec4(position,1.0);
+          gl_Position = projectionMatrix * p;
+        }`,
+      fragmentShader: `
+        varying vec2 vUv;
+        uniform float uStrength;
+        void main(){
+          // radial ring falloff
+          vec2 uv = vUv * 2.0 - 1.0;
+          float r = length(uv);
+          float ring = exp(-pow((r-0.36)/0.06, 2.0)); // soft ring
+          vec3 col = vec3(1.0, 0.95, 0.85) * ring * uStrength;
+          gl_FragColor = vec4(col, ring * 0.25 * uStrength);
+        }`,
+      side: THREE.DoubleSide
+    });
+    const halo = new THREE.Mesh(haloGeo, haloMat);
+    halo.rotation.x = Math.PI/2; // face camera by staying near front, looks subtle
+    halo.renderOrder = -1;
+    bhGroup.add(halo);
+
+    // Accretion disk (warm, brighter)
+    const diskGeo = new THREE.RingGeometry(params.diskInner, params.diskOuter, 512, 1);
+    const diskMat = new THREE.ShaderMaterial({
+      transparent: true,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uSpin: { value: params.spin },
+        uGlow: { value: params.diskGlow },
+        uInner: { value: params.diskInner },
+        uOuter: { value: params.diskOuter }
+      },
+      vertexShader: `
+        uniform float uSpin;
+        varying float vR;
+        void main(){
+          vec3 p = position;
+          float r = length(p.xz);
+          float angle = uSpin * 0.25 * smoothstep(0.0, 1.0, (r - 1.0) / 6.0);
+          float ca = cos(angle), sa = sin(angle);
+          mat2 rot = mat2(ca, -sa, sa, ca);
+          vec2 xz = rot * p.xz;
+          p.x = xz.x; p.z = xz.y;
+          vR = r;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(p,1.0);
+        }`,
+      fragmentShader: `
+        uniform float uGlow, uInner, uOuter, uTime;
+        varying float vR;
+        vec3 heat(float t){
+          // warmer spectrum, more sun-like yellows/oranges
+          vec3 c1 = vec3(1.4, 1.0, 0.45);
+          vec3 c2 = vec3(1.0, 0.55, 0.1);
+          vec3 a = mix(c1, c2, smoothstep(0.1, 0.9, t));
+          return a;
+        }
+        void main(){
+          float t = clamp((vR - uInner) / max(0.0001, (uOuter - uInner)), 0.0, 1.0);
+          float stripe = 0.55 + 0.45 * sin(90.0 * t + uTime*2.0) * smoothstep(0.0,1.0,t);
+          vec3 col = heat(pow(t, 0.7)) * (1.0 + 0.8*stripe);
+          float alpha = smoothstep(0.0, 0.02, t) * (1.0 - smoothstep(0.82, 1.0, t));
+          alpha *= uGlow * 0.28;
+          gl_FragColor = vec4(col * 0.9, alpha);
+        }`
+    });
+    const disk = new THREE.Mesh(diskGeo, diskMat);
+    disk.rotation.x = THREE.MathUtils.degToRad(22);
+    fgScene.add(disk);
+
+    // Scale event horizon
+    const setBHR = (r)=>{ bhMesh.scale.setScalar(r); };
+    setBHR(params.bhRadius);
+
+    // --- Layered starfields (warm, smaller) ------------------------------------------
+    let farStars, nearStars;
+    function makeStarfield(count, radius, baseSize, color, seed=1, faint=1.0){
+      const rng = xmur3(seed.toString());
+      const rand = mulberry32(rng());
+      const geom = new THREE.BufferGeometry();
+      const positions = new Float32Array(count * 3);
+      const sizes = new Float32Array(count);
+      for(let i=0;i<count;i++){
+        const v = new THREE.Vector3().randomDirection().multiplyScalar(radius*(0.75 + 0.25*Math.pow(rand(), 0.7)));
+        positions[i*3+0] = v.x; positions[i*3+1] = v.y; positions[i*3+2] = v.z;
+        sizes[i] = baseSize * (0.5 + 1.6*Math.pow(rand(), 2.0));
+      }
+      geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geom.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+      const mat = new THREE.ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        uniforms: {
+          uColor: { value: new THREE.Color(color) },
+          uPixelRatio: { value: Math.min(devicePixelRatio, 2) },
+          uFaint: { value: faint }
+        },
+        vertexShader: `
+          attribute float aSize;
+          uniform float uPixelRatio;
+          varying float vA;
+          void main(){
+            vA = clamp(aSize/6.0, 0.25, 1.0);
+            vec4 mv = modelViewMatrix * vec4(position, 1.0);
+            gl_Position = projectionMatrix * mv;
+            gl_PointSize = aSize * uPixelRatio * (260.0 / -mv.z);
+          }`,
+        fragmentShader: `
+          uniform vec3 uColor;
+          uniform float uFaint;
+          varying float vA;
+          void main(){
+            vec2 uv = gl_PointCoord * 2.0 - 1.0;
+            float d = dot(uv, uv);
+            float alpha = smoothstep(1.0, 0.0, d) * vA * uFaint;
+            // warm sun-like tint (yellow-orange)
+            vec3 col = uColor * (1.0 + (1.0 - d)*0.45);
+            gl_FragColor = vec4(col, alpha);
+          }`
+      });
+      return new THREE.Points(geom, mat);
+    }
+    function buildStars(){
+      if (farStars) bgScene.remove(farStars);
+      if (nearStars) bgScene.remove(nearStars);
+      // far: very dense, faint; near: sparser, brighter
+      farStars = makeStarfield(params.farStarCount, 5000, 1.1, 0xfff1b8, 101, 0.6);
+      nearStars = makeStarfield(params.nearStarCount, 1400, 2.2, 0xfff2c4, 202, 1.0);
+      bgScene.add(farStars, nearStars);
+    }
+    buildStars();
+
+    // --- Mini Solar Systems with drift + capture -------------------------------------
+    const solarGroup = new THREE.Group();
+    fgScene.add(solarGroup);
+
+    function createSolarSystem(origin){
+      const g = new THREE.Group();
+      g.position.copy(origin);
+
+      // system drift velocity (simple, not physical)
+      const a = Math.random()*Math.PI*2;
+      const s = (0.2 + Math.random()*0.8) * params.sysDrift;
+      g.userData.vel = new THREE.Vector3(Math.cos(a)*s, (Math.random()-0.5)*0.02*s, Math.sin(a)*s);
+
+      // Star (emissive warm)
+      const starCol = new THREE.Color().setHSL(0.08 + 0.08*Math.random(), 0.7, 0.55);
+      const star = new THREE.Mesh(
+        new THREE.SphereGeometry(0.35 + Math.random()*0.25, 32, 32),
+        new THREE.MeshStandardMaterial({ emissive: starCol, emissiveIntensity: 8.5, color: 0x111111, roughness: 0.5, metalness: 0.0 })
+      );
+      g.add(star);
+      const light = new THREE.PointLight(starCol.getHex(), 24, 100, 2);
+      g.add(light);
+
+      const planetCount = 3 + Math.floor(Math.random()*4);
+      for(let i=0;i<planetCount;i++){
+        const dist = 1.5 + i*(0.9 + Math.random()*0.8);
+        const pivot = new THREE.Group(); g.add(pivot);
+        const planet = new THREE.Mesh(
+          new THREE.SphereGeometry(0.12 + Math.random()*0.18, 24, 16),
+          new THREE.MeshStandardMaterial({ color: new THREE.Color().setHSL(Math.random(), 0.5, 0.5), roughness: 0.9, metalness: 0.1 })
+        );
+        planet.position.x = dist;
+        if (Math.random() < 0.25){
+          const r = planet.geometry.parameters.radius;
+          const ring = new THREE.Mesh(
+            new THREE.RingGeometry(r*1.8, r*2.3, 64),
+            new THREE.MeshBasicMaterial({ color: 0xdddddd, side: THREE.DoubleSide, transparent:true, opacity:0.6 })
+          );
+          ring.rotation.x = Math.PI/2.2;
+          planet.add(ring);
+        }
+        pivot.add(planet);
+        pivot.userData = { speed: (0.2 + Math.random()*0.6) * (Math.random()<0.5?-1:1) };
+      }
+      return g;
+    }
+
+    function spawnSystemInShell(rMin=14, rMax=36){
+      const dir = new THREE.Vector3().randomDirection();
+      const d = rMin + Math.random()*(rMax - rMin);
+      dir.multiplyScalar(d); dir.y *= 0.35;
+      const sys = createSolarSystem(dir);
+      return sys;
+    }
+
+    function rebuildSolarSystems(){
+      solarGroup.clear();
+      for(let i=0;i<params.solarSystems;i++){
+        solarGroup.add(spawnSystemInShell());
+      }
+    }
+    rebuildSolarSystems();
+
+    // --- Postprocessing: background lensing with visible photon ring -----------------
+    // Render background to composer with lensing + ring; then draw foreground normally
+    const bgComposer = new EffectComposer(renderer);
+    const bgRenderPass = new RenderPass(bgScene, camera);
+    bgComposer.addPass(bgRenderPass);
+
+    const LensingShader = {
+      uniforms: {
+        tDiffuse:   { value: null },
+        uStrength:  { value: params.lensingStrength },
+        uCenter:    { value: new THREE.Vector2(0.5, 0.5) },
+        uRingRadius:{ value: params.ringRadius },
+        uRingWidth: { value: params.ringWidth },
+        uRingGlow:  { value: params.ringGlow },
+        uAspect:    { value: innerWidth/innerHeight },
+        uEnabled:   { value: params.lensingEnabled ? 1.0 : 0.0 }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main(){ vUv = uv; gl_Position = vec4(position,1.0); }`,
+      fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform float uStrength, uRingRadius, uRingWidth, uRingGlow, uEnabled, uAspect;
+        uniform vec2  uCenter;
+        varying vec2 vUv;
+
+        void main(){
+          vec2 uv = vUv;
+          if (uEnabled > 0.5){
+            // normalize coords so radial distance is aspect-correct
+            vec2 p = vUv - uCenter;
+            p.x *= uAspect;
+            float r = length(p);
+            float rn = clamp(r / max(1e-4, 0.5), 0.0, 1.0);
+            // smooth radial pull toward center (stylized lensing)
+            float k = uStrength * (1.0 - rn);
+            vec2 pull = (vUv - uCenter) * (0.7 + 0.3*(1.0 - rn));
+            uv = vUv - pull * k;
+
+            // add visible photon ring / Einstein ring (additive)
+            float ring = exp(-pow((r - uRingRadius)/max(1e-4, uRingWidth), 2.0));
+            vec3 ringCol = vec3(1.0, 0.96, 0.88) * ring * uRingGlow;
+            vec4 base = texture2D(tDiffuse, uv);
+            gl_FragColor = vec4(base.rgb + ringCol, base.a);
+            return;
+          }
+          gl_FragColor = texture2D(tDiffuse, uv);
+        }`
+    };
+    const lensingPass = new ShaderPass(LensingShader);
+    bgComposer.addPass(lensingPass);
+
+    // --- Resize ----------------------------------------------------------------------
+    addEventListener('resize', onResize);
+    function onResize(){
+      camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      bgComposer.setSize(innerWidth, innerHeight);
+      lensingPass.uniforms.uCenter.value.set(0.5, 0.5);
+      lensingPass.uniforms.uAspect.value = innerWidth/innerHeight;
+    }
+    onResize();
+
+    // --- UI (lil-gui) ----------------------------------------------------------------
+    const gui = new GUI({ title: 'Black Hole Controls' });
+
+    const fBH = gui.addFolder('Black Hole');
+    fBH.add(params, 'bhRadius', 0.8, 4.0, 0.05).name('Event Horizon R')
+      .onChange(v=>{ setBHR(v); });
+    fBH.add(params, 'spin', 0.0, 1.0, 0.01).name('Spin (warp)')
+      .onChange(v=> diskMat.uniforms.uSpin.value = v );
+
+    const fDisk = gui.addFolder('Accretion Disk');
+    fDisk.add(params, 'diskInner', 1.1, 6.5, 0.05).name('Disk Inner')
+      .onChange(v=> diskMat.uniforms.uInner.value = v );
+    fDisk.add(params, 'diskOuter', 2.5, 12.0, 0.05).name('Disk Outer')
+      .onChange(v=> diskMat.uniforms.uOuter.value = v );
+    fDisk.add(params, 'diskGlow', 0.0, 8.0, 0.05).name('Glow')
+      .onChange(v=> diskMat.uniforms.uGlow.value = v );
+    fDisk.add(params, 'diskSpeed', 0.0, 3.0, 0.01).name('Rotation Speed');
+
+    const fLens = gui.addFolder('Gravitational Lensing');
+    fLens.add(params, 'lensingEnabled').name('Enabled')
+      .onChange(v=> lensingPass.uniforms.uEnabled.value = v ? 1.0 : 0.0 );
+    fLens.add(params, 'lensBackgroundOnly').name('Background Only');
+    fLens.add(params, 'depthAwareForForeground').name('Depth-aware (fg)');
+    fLens.add(params, 'lensingStrength', 0.0, 2.0, 0.01).name('Strength')
+      .onChange(v=> lensingPass.uniforms.uStrength.value = v );
+    fLens.add(params, 'ringRadius', 0.2, 0.9, 0.001).name('Ring Radius')
+      .onChange(v=> lensingPass.uniforms.uRingRadius.value = v );
+    fLens.add(params, 'ringWidth', 0.004, 0.08, 0.001).name('Ring Width')
+      .onChange(v=> lensingPass.uniforms.uRingWidth.value = v );
+    fLens.add(params, 'ringGlow', 0.0, 3.0, 0.01).name('Ring Glow')
+      .onChange(v=> lensingPass.uniforms.uRingGlow.value = v );
+
+    const fStars = gui.addFolder('Stars');
+    fStars.add(params, 'farStarCount', 2000, 80000, 1000).name('Far Count').onFinishChange(buildStars);
+    fStars.add(params, 'nearStarCount', 0, 10000, 100).name('Near Count').onFinishChange(buildStars);
+
+    const fSystems = gui.addFolder('Solar Systems');
+    fSystems.add(params, 'solarSystems', 0, 24, 1).name('Count').onFinishChange(rebuildSolarSystems);
+    fSystems.add(params, 'planetSpeed', 0.0, 4.0, 0.01).name('Orbit Speed');
+    fSystems.add(params, 'sysDrift', 0.0, 1.5, 0.01).name('System Drift');
+    fSystems.add(params, 'captureRadius', 2.5, 30.0, 0.1).name('Capture Radius');
+
+    gui.add(params, 'exposure', 0.2, 2.5, 0.01).name('Exposure').onChange(v => renderer.toneMappingExposure = v);
+    gui.add(params, 'animate').name('Animate (Pause/Run)');
+
+    window.addEventListener('keydown', (e)=>{
+      if (e.key.toLowerCase() === 'h') gui._hidden ? gui.show() : gui.hide();
+    });
+    document.getElementById('resetCam').onclick = ()=>{
+      camera.position.set(0, 5, 18);
+      controls.target.set(0,0,0);
+      controls.update();
+    };
+
+    // --- Animation loop --------------------------------------------------------------
+    function animate(){
+      const dt = Math.min(clock.getDelta(), 0.05);
+      requestAnimationFrame(animate);
+
+      bhMat.uniforms.uCam.value.copy(camera.position);
+      diskMat.uniforms.uTime.value += dt;
+
+      if (params.animate){
+        // disk spin
+        disk.rotation.z += dt * params.diskSpeed * 0.5;
+
+        // systems: orbit planets + drift + gravity capture
+        solarGroup.children.forEach(sys=>{
+          // planet orbits
+          sys.children.forEach(obj=>{
+            if (obj.userData && obj.userData.speed !== undefined){
+              obj.rotation.y += dt * obj.userData.speed * params.planetSpeed;
+            }
+          });
+          // drift
+          if (sys.userData && sys.userData.vel){
+            sys.position.addScaledVector(sys.userData.vel, dt);
+          }
+          // simple gravitational pull toward BH (just a nudge)
+          const toBH = new THREE.Vector3().copy(bhMesh.position).sub(sys.position);
+          const dist = toBH.length();
+          const g = 0.06 / (0.5 + dist*dist); // fudge factor
+          sys.userData.vel.addScaledVector(toBH.normalize(), g);
+
+          // capture check
+          if (dist < params.captureRadius){
+            // remove & respawn elsewhere
+            solarGroup.remove(sys);
+            solarGroup.add(spawnSystemInShell());
+          }
+        });
+
+        // slow parallax on near stars to avoid a static skybox feel
+        if (nearStars){
+          nearStars.rotation.y += dt * 0.01;
+          nearStars.rotation.x += dt * 0.005;
+        }
+      }
+
+      // Render order:
+      // 1) Background (stars) — with lensing
+      if (params.lensBackgroundOnly){
+        bgComposer.render();
+        // 2) Foreground (BH/disk/systems) — optionally lens some fg bodies when directly behind BH
+        if (params.depthAwareForForeground){
+          // crude heuristic: if an object is further than BH and close to BH on screen, render it via bgComposer pass (lensed)
+          const bhNDC = toNDC(bhGroup.position, camera);
+          const threshold = 0.085; // screen-space radius where we consider “behind”
+          const toLens = [];
+          solarGroup.children.forEach(sys=>{
+            const sysNDC = toNDC(sys.position, camera);
+            const dScreen = sysNDC.distanceTo(bhNDC);
+            const dCamSys = camera.position.distanceTo(sys.position);
+            const dCamBH  = camera.position.distanceTo(bhGroup.position);
+            if (dScreen < threshold && dCamSys > dCamBH*1.02){
+              toLens.push(sys);
+            }
+          });
+          // temporarily move those systems to bgScene, render a quick lens pass overlay, then move back
+          if (toLens.length){
+            toLens.forEach(sys=> { fgScene.remove(sys); bgScene.add(sys); });
+            bgComposer.render();
+            toLens.forEach(sys=> { bgScene.remove(sys); fgScene.add(sys); });
+          }
+        }
+        // finally draw the rest of the foreground normally
+        renderer.autoClear = false;
+        renderer.clearDepth(); // keep bg color, reset depth
+        renderer.render(fgScene, camera);
+        renderer.autoClear = true;
+      } else {
+        // lens everything (bg + fg together)
+        // draw bg into composer target first
+        bgComposer.render();
+        renderer.autoClear = false;
+        renderer.clearDepth();
+        renderer.render(fgScene, camera);
+        renderer.autoClear = true;
+      }
+
+      controls.update();
+    }
+    animate();
+
+    // --- Helpers ---------------------------------------------------------------------
+    function toNDC(worldPos, cam){
+      const p = worldPos.clone().project(cam);
+      return new THREE.Vector2(p.x, p.y);
+    }
+
+    // Tiny PRNG utils
+    function xmur3(str){
+      let h = 1779033703 ^ str.length;
+      for (let i=0; i<str.length; i++){
+        h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+        h = h << 13 | h >>> 19;
+      }
+      return function(){ h = Math.imul(h ^ (h>>>16), 2246822507); h = Math.imul(h ^ (h>>>13), 3266489909); return (h ^= h>>>16) >>> 0; }
+    }
+    function mulberry32(a){
+      return function(){
+        let t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      }
+    }
+
+    // Compatibility warning if modules/import maps not supported
+    if (!('noModule' in HTMLScriptElement.prototype) && !window.importmap){
+      document.getElementById('compat').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

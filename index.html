@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -25,7 +26,7 @@
     *, *::before, *::after { box-sizing:border-box; }
     body { margin:0; font-family:system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background:#fff; color:var(--text); }
     .top-banner { background:var(--primary); color:#fff; text-align:center; padding:0.5rem; font-weight:600; }
-    .container { max-width:1000px; margin:auto; padding:2rem 1rem; text-align:center; }
+    .container { max-width:1000px; margin:auto; padding:2rem 1rem 1.5rem; text-align:center; }
     h1 { font-size:2rem; font-weight:700; color:var(--primary); margin-bottom:0.5rem; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
     .contractuel { color:var(--secondary); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
     .guarantee { background:var(--highlight); display:inline-block; margin:0.5rem auto 2rem; padding:0.75rem 1.25rem; border-radius:12px; font-weight:500; }
@@ -35,14 +36,16 @@
     .video-column { display:flex; flex-direction:column; align-items:center; }
     .video-placeholder { cursor:pointer; width:100%; aspect-ratio:9/16; border-radius:12px; overflow:hidden; }
     .video-placeholder img { width:100%; height:100%; object-fit:cover; }
-    .widget-container { width:100%; }
-    .iclosed-frame { width:100%; border:0; display:block; height:1200px; }
+    .widget-container { width:100%; overflow:visible; }
+    .iclosed-frame { width:100%; border:0; display:block; min-height:720px; }
     @media (min-width:768px){
       .content-flex { flex-direction:row; justify-content:center; align-items:flex-start; }
       .video-placeholder { width:360px; }
       .widget-container { flex:1; }
     }
-    footer { text-align:center; font-size:0.8rem; color:#64748b; margin:3rem 0 1rem; }
+    footer { text-align:center; font-size:0.8rem; background:var(--primary); color:#ffffff; margin:0; padding:1.5rem 1rem; }
+    footer a { color:#ffffff; text-decoration:underline; }
+    #reviews.container { padding-top: 2rem; padding-bottom: 2rem; }
   </style>
 
   <!-- Google Tag Manager -->
@@ -96,17 +99,21 @@
 
       <div class="widget-container">
         <p class="cta">Entrez vos informations pour voir s'il reste des créneaux :</p>
-        <iframe id="iclosed-frame" title="Agendac - 30 min Google Meet"
-                class="iclosed-frame" loading="lazy"
-                fetchpriority="low" referrerpolicy="no-referrer-when-downgrade"
-                src="https://app.iclosed.io/e/agendac-sas/agendac">
-        </iframe>
+        <div id="iclosed-widget" class="iclosed-widget" title="Agendac - 30 min Google Meet"
+             data-url="https://app.iclosed.io/e/agendac-sas/agendac" style="width:100%;"></div>
       </div>
     </section>
   </main>
 
+  <!-- Avis Google (Elfsight) - section lazy -->
+  <section id="reviews" class="container" style="display:none;">
+    <div id="elfsight-container">
+      <!-- Placeholder; script injecté à la première interaction -->
+    </div>
+  </section>
+
   <footer>
-    <p style="color:#666666;font-size:0.8rem;line-height:1.5;">
+    <p style="color:#ffffff;font-size:0.8rem;line-height:1.5;">
       © Copyright 2025, Tous droits réservés.<br>
       Ce site ne fait pas partie du site Web de Facebook™ ou de Facebook™ Inc. De plus, ce site n'est en aucun cas approuvé par Facebook™. FACEBOOK™ est une marque commerciale de FACEBOOK™, Inc.<br>
       Agendac SAS - SIREN : 930805981 - TVA : FR94930805981<br>
@@ -146,12 +153,14 @@
     })();
   </script>
 
-  <!-- Propagation paramètres URL vers l'iframe -->
+  <!-- Propagation paramètres URL vers le widget iCLOSE -->
   <script>
     (function () {
-      var iframe = document.getElementById('iclosed-frame');
-      if (!iframe) return;
-      var url = new URL(iframe.getAttribute('src'), window.location.href);
+      var widget = document.getElementById('iclosed-widget');
+      if (!widget) return;
+      var dataUrl = widget.getAttribute('data-url');
+      if (!dataUrl) return;
+      var url = new URL(dataUrl, window.location.href);
       var pageParams = new URLSearchParams(window.location.search);
       (function copyHashParams(){
         var hash = window.location.hash || '';
@@ -170,7 +179,45 @@
           somethingToAdd = true;
         }
       });
-      if (somethingToAdd) iframe.src = url.toString();
+      if (somethingToAdd) widget.setAttribute('data-url', url.toString());
+    })();
+  </script>
+
+  <!-- Widget iCLOSE officiel -->
+  <script src="https://app.iclosed.io/assets/widget.js" async></script>
+
+  <!-- Lazy load Elfsight when user interacts -->
+  <script>
+    (function(){
+      var loaded = false;
+      var reviewsSection = document.getElementById('reviews');
+      function loadElfsight(){
+        if (loaded) return; loaded = true;
+        if (reviewsSection) reviewsSection.style.display = 'block';
+        var s = document.createElement('script');
+        s.src = 'https://static.elfsight.com/platform/platform.js';
+        s.async = true;
+        document.body.appendChild(s);
+        var div = document.createElement('div');
+        div.className = 'elfsight-app-26fed998-cc22-4c2b-a018-e45f0b4907f9';
+        div.setAttribute('data-elfsight-app-lazy', '');
+        var container = document.getElementById('elfsight-container');
+        if (container) container.appendChild(div);
+        detach();
+      }
+      function onFirstInteraction(){ loadElfsight(); }
+      function detach(){
+        window.removeEventListener('scroll', onFirstInteraction);
+        window.removeEventListener('mousemove', onFirstInteraction);
+        window.removeEventListener('keydown', onFirstInteraction);
+        window.removeEventListener('touchstart', onFirstInteraction);
+        window.removeEventListener('click', onFirstInteraction);
+      }
+      window.addEventListener('scroll', onFirstInteraction, { once: true, passive: true });
+      window.addEventListener('mousemove', onFirstInteraction, { once: true });
+      window.addEventListener('keydown', onFirstInteraction, { once: true });
+      window.addEventListener('touchstart', onFirstInteraction, { once: true, passive: true });
+      window.addEventListener('click', onFirstInteraction, { once: true });
     })();
   </script>
 </body>

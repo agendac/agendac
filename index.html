@@ -10,11 +10,11 @@
   <!-- Meta domain verification for agendac-sas.fr -->
   <meta name="facebook-domain-verification" content="v6v1wt60haps0t5u3riwjlyvex6jce" />
 
-  <!-- Preconnect: uniquement les origines utiles au démarrage -->
+  <!-- Preconnect -->
   <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://app.iclosed.io" crossorigin>
 
-  <!-- Preload miniature LCP (single source) -->
+  <!-- Preload miniature LCP -->
   <link rel="preload" as="image"
         href="https://raw.githubusercontent.com/agendac/agendac/refs/heads/main/Thumbnail%20VSL%20Agendac.avif"
         fetchpriority="high">
@@ -45,7 +45,19 @@
     footer { text-align:center; font-size:0.8rem; color:#64748b; margin:3rem 0 1rem; }
   </style>
 
-  <!-- Hotjar Tracking Code for agendac-sas.fr -->
+  <!-- Google Tag Manager -->
+  <script>
+    (function(w,d,s,l,i){
+      w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+      var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
+      j.async=true; j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+      f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KH65F94J');
+  </script>
+  <!-- End Google Tag Manager -->
+
+  <!-- Hotjar Tracking Code -->
   <script>
     (function(h,o,t,j,a,r){
       h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
@@ -56,59 +68,15 @@
       a.appendChild(r);
     })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
   </script>
-
-  <!-- DataLayer + PageView (custom) + GTM lazy loader (avec callback) -->
-  <script>
-    // DataLayer global
-    window.dataLayer = window.dataLayer || [];
-
-    // Flags anti-doublon
-    window.__pv_fired = false;
-    window.__gtm_loaded = false;
-
-    // Fonction pour pousser un "view_page" custom que GTM lira à l'arrivée
-    function fireViewPage(){
-      if (window.__pv_fired) return;
-      window.__pv_fired = true;
-      window.dataLayer.push({
-        event: 'view_page',
-        event_id: Date.now().toString(),
-        page_location: location.href,
-        page_path: location.pathname + location.search + location.hash,
-        page_title: document.title,
-        page_referrer: document.referrer || null
-      });
-    }
-
-    // Push immédiat (sera consommé par GTM quand il se charge)
-    fireViewPage();
-
-    // GTM: charge seulement après interaction pour score max, avec callback
-    window.gtmId = 'GTM-KH65F94J';
-    function loadGTM(cb){
-      if (window.__gtm_loaded) { cb && cb(); return; }
-      window.__gtm_loaded = true;
-      var s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://www.googletagmanager.com/gtm.js?id=' + window.gtmId;
-      s.onload = function(){
-        // Sécurité : si le push initial a eu lieu trop tôt, on repousse une seule fois
-        fireViewPage();
-        cb && cb();
-      };
-      document.head.appendChild(s);
-    }
-
-    addEventListener('click',  function(){ loadGTM(); }, {once:true});
-    addEventListener('keydown', function(){ loadGTM(); }, {once:true});
-    addEventListener('scroll', function(){ loadGTM(); }, {once:true, passive:true});
-  </script>
 </head>
+
 <body>
-  <!-- GTM noscript (chargera le container si JS désactivé) -->
+  <!-- Google Tag Manager (noscript) -->
   <noscript>
-    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KH65F94J" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KH65F94J"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
   </noscript>
+  <!-- End Google Tag Manager (noscript) -->
 
   <div class="top-banner">Uniquement pour sociétés ENR<br>à plus de 300 000 € de CA annuel</div>
 
@@ -120,24 +88,18 @@
       <div class="video-column">
         <p class="cta">↓ Cliquez sur la vidéo pour la lancer ↓</p>
         <div class="video-placeholder" id="video-launch">
-          <img
-            src="https://raw.githubusercontent.com/agendac/agendac/refs/heads/main/Thumbnail%20VSL%20Agendac.avif"
-            alt="Vidéo Agendac"
-            width="320" height="640"
-            fetchpriority="high" decoding="async">
+          <img src="https://raw.githubusercontent.com/agendac/agendac/refs/heads/main/Thumbnail%20VSL%20Agendac.avif"
+               alt="Vidéo Agendac" width="320" height="640"
+               fetchpriority="high" decoding="async">
         </div>
       </div>
 
       <div class="widget-container">
         <p class="cta">Entrez vos informations pour voir s'il reste des créneaux :</p>
-        <iframe
-          id="iclosed-frame"
-          title="Agendac - 30 min Google Meet"
-          class="iclosed-frame"
-          loading="lazy"
-          fetchpriority="low"
-          referrerpolicy="no-referrer-when-downgrade"
-          src="https://app.iclosed.io/e/agendac-sas/agendac">
+        <iframe id="iclosed-frame" title="Agendac - 30 min Google Meet"
+                class="iclosed-frame" loading="lazy"
+                fetchpriority="low" referrerpolicy="no-referrer-when-downgrade"
+                src="https://app.iclosed.io/e/agendac-sas/agendac">
         </iframe>
       </div>
     </section>
@@ -153,17 +115,12 @@
     </p>
   </footer>
 
-  <!-- Lecture vidéo Wistia au clic + push d'un Custom Event vers GTM -->
+  <!-- Lecture vidéo Wistia au clic -->
   <script>
     (function(){
       var el = document.getElementById('video-launch');
       if (!el) return;
-
       el.addEventListener('click', function(){
-        // S'assure que GTM est chargé (si lazy)
-        if (typeof loadGTM === 'function') loadGTM();
-
-        // Envoi d'un Custom Event à GTM
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
           event: 'video_thumb_click',
@@ -174,14 +131,11 @@
           content_name: 'Agendac hero video',
           event_id: Date.now().toString()
         });
-
-        // Lancement de la vidéo Wistia
         var container = this;
         container.innerHTML =
           '<div class="wistia_responsive_wrapper" style="width:100%;height:100%;">' +
             '<div class="wistia_embed wistia_async_vwnkq3qow0" style="height:100%;width:100%">&nbsp;</div>' +
           '</div>';
-
         ['https://fast.wistia.com/embed/medias/vwnkq3qow0.jsonp','https://fast.wistia.com/assets/external/E-v1.js']
           .forEach(function(src){
             var s=document.createElement('script');
@@ -192,18 +146,13 @@
     })();
   </script>
 
-  <!-- Propagation AUTOMATIQUE de tous les paramètres d'URL vers l'iframe iClosed -->
+  <!-- Propagation paramètres URL vers l'iframe -->
   <script>
     (function () {
       var iframe = document.getElementById('iclosed-frame');
       if (!iframe) return;
-
       var url = new URL(iframe.getAttribute('src'), window.location.href);
-
-      // 1) Params de la page (query string)
       var pageParams = new URLSearchParams(window.location.search);
-
-      // 2) Params dans le hash (#utm_source=...&gclid=...)
       (function copyHashParams(){
         var hash = window.location.hash || '';
         if (hash.startsWith('#')) hash = hash.slice(1);
@@ -213,8 +162,6 @@
           if (!pageParams.has(key)) pageParams.set(key, value);
         });
       })();
-
-      // 3) Merge sans écraser les params déjà présents sur l'iframe
       var srcParams = url.searchParams;
       var somethingToAdd = false;
       pageParams.forEach(function(value, key){
@@ -223,11 +170,7 @@
           somethingToAdd = true;
         }
       });
-
-      // 4) Recharge l'iframe uniquement si on a ajouté quelque chose
-      if (somethingToAdd) {
-        iframe.src = url.toString();
-      }
+      if (somethingToAdd) iframe.src = url.toString();
     })();
   </script>
 </body>

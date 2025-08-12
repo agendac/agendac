@@ -183,16 +183,14 @@
     })();
   </script>
 
-  <!-- Widget iCLOSE officiel -->
-  <script src="https://app.iclosed.io/assets/widget.js" async></script>
-
-  <!-- Lazy load Elfsight when user interacts -->
+  <!-- Lazy load iCLOSE + Elfsight when user interacts -->
   <script>
     (function(){
-      var loaded = false;
+      var elfsightLoaded = false;
+      var icloseLoaded = false;
       var reviewsSection = document.getElementById('reviews');
       function loadElfsight(){
-        if (loaded) return; loaded = true;
+        if (elfsightLoaded) return; elfsightLoaded = true;
         if (reviewsSection) reviewsSection.style.display = 'block';
         var s = document.createElement('script');
         s.src = 'https://static.elfsight.com/platform/platform.js';
@@ -203,9 +201,19 @@
         div.setAttribute('data-elfsight-app-lazy', '');
         var container = document.getElementById('elfsight-container');
         if (container) container.appendChild(div);
+      }
+      function loadIClose(){
+        if (icloseLoaded) return; icloseLoaded = true;
+        var s = document.createElement('script');
+        s.src = 'https://app.iclosed.io/assets/widget.js';
+        s.async = true;
+        document.body.appendChild(s);
+      }
+      function onFirstInteraction(){
+        loadIClose();
+        loadElfsight();
         detach();
       }
-      function onFirstInteraction(){ loadElfsight(); }
       function detach(){
         window.removeEventListener('scroll', onFirstInteraction);
         window.removeEventListener('mousemove', onFirstInteraction);

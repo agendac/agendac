@@ -32,16 +32,12 @@
     .guarantee { background:var(--highlight); display:inline-block; margin:0.5rem auto 2rem; padding:0.75rem 1.25rem; border-radius:12px; font-weight:500; }
     .guarantee strong { font-weight:700; color:var(--primary); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
     .cta { font-size:1rem; font-weight:600; color:var(--primary); margin-bottom:0.5rem; line-height:1.25; min-height:1.25em; }
-    .content-flex { display:flex; flex-direction:column; align-items:center; gap:1.5rem; }
-    .video-column { display:flex; flex-direction:column; align-items:center; }
     .video-placeholder { cursor:pointer; width:100%; aspect-ratio:9/16; border-radius:12px; overflow:hidden; }
     .video-placeholder img { width:100%; height:100%; object-fit:cover; }
-    .widget-container { width:100%; overflow:visible; }
     .iclosed-frame { width:100%; border:0; display:block; min-height:720px; }
-    @media (min-width:768px){
-      .content-flex { flex-direction:row; justify-content:center; align-items:flex-start; }
-      .video-placeholder { width:360px; }
-      .widget-container { flex:1; }
+    @media (max-width:767px){
+      .content-flex { flex-direction:column; gap:1.5rem; }
+      .video-placeholder { width:100%; }
     }
     footer { text-align:center; font-size:0.8rem; background:var(--primary); color:#ffffff; margin:0; padding:1.5rem 1rem; }
     footer a { color:#ffffff; text-decoration:underline; }
@@ -85,25 +81,51 @@
 
   <main class="container">
     <h1>Agendac vous garantit <span class="contractuel">contractuellement</span><br> +10 chantiers dans les 90 prochains jours</h1>
-    <p class="guarantee"><strong>Garantie +10 ou +1000</strong> :<br>Si ce seuil n’est pas atteint, cela ne vous coûte rien et recevez 1 000 € de dédommagement.</p>
+    <p class="guarantee"><strong>Garantie +10 ou +1000</strong> :<br>Si ce seuil n'est pas atteint, cela ne vous coûte rien et recevez 1 000 € de dédommagement.</p>
 
-    <section class="content-flex">
-      <div class="video-column">
+    <div style="display: flex; gap: 2rem; align-items: flex-start; justify-content: center;" class="content-flex">
+      <section style="flex: 0 0 auto;">
         <p class="cta">↓ Cliquez sur la vidéo pour la lancer ↓</p>
-        <div class="video-placeholder" id="video-launch">
+        <div class="video-placeholder" id="video-launch" style="width: 360px;">
           <img src="https://raw.githubusercontent.com/agendac/agendac/refs/heads/main/Thumbnail%20VSL%20Agendac.avif"
                alt="Vidéo Agendac" width="320" height="640"
                fetchpriority="high" decoding="async">
         </div>
-      </div>
+      </section>
 
-      <div class="widget-container">
+      <section style="flex: 1; min-width: 0;">
         <p class="cta">Entrez vos informations pour voir s'il reste des créneaux :</p>
         <div id="iclosed-widget" class="iclosed-widget" title="Agendac - 30 min Google Meet"
              data-url="https://app.iclosed.io/e/agendac-sas/agendac" style="width:100%;"></div>
-      </div>
-    </section>
+      </section>
+    </div>
+
+    <style>
+      @media (max-width: 767px) {
+        .content-flex {
+          flex-direction: column !important;
+          gap: 2rem !important;
+          align-items: center !important;
+          text-align: center !important;
+        }
+        .video-placeholder {
+          width: 100% !important;
+          max-width: 320px !important;
+          margin: 0 auto !important;
+        }
+        .cta {
+          text-align: center !important;
+          margin-bottom: 1rem !important;
+        }
+        section {
+          width: 100% !important;
+          text-align: center !important;
+        }
+      }
+    </style>
   </main>
+
+
 
   <!-- Avis Google (Elfsight) - section lazy -->
   <section id="reviews" class="container" style="display:none;">

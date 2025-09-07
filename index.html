@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -43,7 +44,8 @@
 
   <!-- Preconnect -->
   <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://app.iclosed.io" crossorigin>
+  <link rel="preconnect" href="https://api.leadconnectorhq.com" crossorigin>
+  <link rel="preconnect" href="https://link.msgsndr.com" crossorigin>
 
   <!-- Preload miniature LCP -->
   <link rel="preload" as="image"
@@ -125,8 +127,9 @@
 
       <section style="flex: 1; min-width: 0;">
         <p class="cta">Entrez vos informations pour voir s'il reste des créneaux :</p>
-        <div id="iclosed-widget" class="iclosed-widget" title="Agendac - 30 min Google Meet"
-             data-url="https://app.iclosed.io/e/agendac-sas/agendac" style="width:100%;"></div>
+        <div id="gohighlevel-widget" class="gohighlevel-widget" style="width:100%;">
+          <iframe src="https://api.leadconnectorhq.com/widget/booking/57xP6cJ3bacw7ZTpsRXe" style="width: 100%;border:none;overflow: hidden;" scrolling="no" id="57xP6cJ3bacw7ZTpsRXe_1756751482989"></iframe>
+        </div>
       </section>
     </div>
 
@@ -205,41 +208,13 @@
     })();
   </script>
 
-  <!-- Propagation paramètres URL vers le widget iCLOSE -->
-  <script>
-    (function () {
-      var widget = document.getElementById('iclosed-widget');
-      if (!widget) return;
-      var dataUrl = widget.getAttribute('data-url');
-      if (!dataUrl) return;
-      var url = new URL(dataUrl, window.location.href);
-      var pageParams = new URLSearchParams(window.location.search);
-      (function copyHashParams(){
-        var hash = window.location.hash || '';
-        if (hash.startsWith('#')) hash = hash.slice(1);
-        if (!hash) return;
-        var hashParams = new URLSearchParams(hash);
-        hashParams.forEach(function(value, key){
-          if (!pageParams.has(key)) pageParams.set(key, value);
-        });
-      })();
-      var srcParams = url.searchParams;
-      var somethingToAdd = false;
-      pageParams.forEach(function(value, key){
-        if (!srcParams.has(key)) {
-          srcParams.set(key, value);
-          somethingToAdd = true;
-        }
-      });
-      if (somethingToAdd) widget.setAttribute('data-url', url.toString());
-    })();
-  </script>
 
-  <!-- Lazy load iCLOSE + Elfsight when user interacts -->
+
+  <!-- Lazy load GoHighLevel + Elfsight when user interacts -->
   <script>
     (function(){
       var elfsightLoaded = false;
-      var icloseLoaded = false;
+      var gohighlevelLoaded = false;
       var reviewsSection = document.getElementById('reviews');
       function loadElfsight(){
         if (elfsightLoaded) return; elfsightLoaded = true;
@@ -254,15 +229,15 @@
         var container = document.getElementById('elfsight-container');
         if (container) container.appendChild(div);
       }
-      function loadIClose(){
-        if (icloseLoaded) return; icloseLoaded = true;
+      function loadGoHighLevel(){
+        if (gohighlevelLoaded) return; gohighlevelLoaded = true;
         var s = document.createElement('script');
-        s.src = 'https://app.iclosed.io/assets/widget.js';
+        s.src = 'https://link.msgsndr.com/js/form_embed.js';
         s.async = true;
         document.body.appendChild(s);
       }
       function onFirstInteraction(){
-        loadIClose();
+        loadGoHighLevel();
         loadElfsight();
         detach();
       }
